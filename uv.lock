@@ -1,5 +1,4 @@
 version = 1
-revision = 1
 requires-python = ">=3.13"
 
 [[package]]
@@ -274,6 +273,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pyttings"
+version = "2.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/79/cb/4360fd0c279ddb531917fb64f35b54cb25f436e8d2b06f989aaff9cda235/pyttings-2.1.0.tar.gz", hash = "sha256:50dfef25da7eacd7201346e53015570096a87e4868cc42ec4143b39bb68d6540", size = 10968 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e1/bc/594f3c93349cee6930a2d365b17907647b6b1014f9af732ad39af6fcef26/pyttings-2.1.0-py3-none-any.whl", hash = "sha256:e63679533ea1cfa0c250d37c4f57557df955d393bfd60a309cb46f87729d9327", size = 7929 },
+]
+
+[[package]]
 name = "pytz"
 version = "2025.2"
 source = { registry = "https://pypi.org/simple" }
@@ -289,6 +297,7 @@ source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
     { name = "pydantic" },
+    { name = "pyttings" },
     { name = "tortoise-orm", extra = ["asyncpg"] },
     { name = "uvicorn" },
 ]
@@ -306,6 +315,7 @@ dev = [
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115.12" },
     { name = "pydantic", specifier = ">=2.10.6" },
+    { name = "pyttings", specifier = ">=2.1.0" },
     { name = "tortoise-orm", extras = ["asyncpg"], specifier = ">=0.24.2" },
     { name = "uvicorn", specifier = ">=0.34.0" },
 ]
