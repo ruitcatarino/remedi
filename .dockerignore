@@ -1,0 +1,18 @@
+# Exclude the project virtual environment from image builds
+.venv
+
+.idea
+.vscode
+\.*_cache
+
+.git*
+*.md
+
+
+Dockerfile
+*compose.*yml
+.dockerignore
+
+.env
+Makefile
+docs/
