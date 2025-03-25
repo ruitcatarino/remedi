@@ -7,8 +7,6 @@
 ```mermaid
 erDiagram
     users ||--o{ persons : "registers"
-    users ||--o{ notification_preferences : "configures"
-    users ||--o{ device_tokens : "registers"
     persons ||--o{ medications : "is prescribed"
     medications ||--o{ medication_logs : "generates"
 
@@ -17,6 +15,8 @@ erDiagram
         string email
         string password_hash
         string name
+        string phone_number
+        date birth_date
         timestamp created_at
         timestamp updated_at
     }
@@ -25,8 +25,6 @@ erDiagram
         int id PK
         int user_id FK
         string name
-        string type
-        string species
         date birth_date
         text notes
         timestamp created_at
@@ -38,10 +36,10 @@ erDiagram
         int person_id FK
         string name
         string dosage
-        string frequency
-        string time_of_day
+        timedelta frequency
         date start_date
         date end_date
+        int total_doses
         text notes
         timestamp created_at
         timestamp updated_at
@@ -54,25 +52,6 @@ erDiagram
         timestamp taken_time
         boolean skipped
         text notes
-        timestamp created_at
-        timestamp updated_at
-    }
-    
-    notification_preferences {
-        int id PK
-        int user_id FK
-        boolean email_enabled
-        boolean push_enabled
-        int reminder_minutes
-        timestamp created_at
-        timestamp updated_at
-    }
-    
-    device_tokens {
-        int id PK
-        int user_id FK
-        text token
-        string device_type
         timestamp created_at
         timestamp updated_at
     }
