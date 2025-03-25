@@ -1,8 +1,13 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "remedi"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+license = { file = "LICENSE" }
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.115.12",
@@ -36,3 +41,11 @@ extend-select = [
     "UP",     # https://docs.astral.sh/ruff/rules/#pyupgrade-up
     "RUF100", # https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
 ]
+
+[project.urls]
+Homepage = "https://github.com/ruitcatarino/remedi"
+Repository = "https://github.com/ruitcatarino/remedi"
+Issues = "https://github.com/ruitcatarino/remedi/issues"
+
+[tool.setuptools]
+packages = ["remedi"]
