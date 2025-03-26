@@ -6,8 +6,6 @@
 \.*_cache
 
 .git*
-*.md
-
 
 Dockerfile
 *compose.*yml
