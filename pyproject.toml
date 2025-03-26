@@ -43,6 +43,7 @@ dependencies = [
     "email-validator>=2.2.0",
     "fastapi>=0.115.12",
     "pydantic>=2.10.6",
+    "pyjwt>=2.10.1",
     "pyttings>=2.1.0",
     "tortoise-orm[asyncpg]>=0.24.2",
     "uvicorn>=0.34.0",

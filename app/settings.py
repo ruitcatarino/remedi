@@ -4,3 +4,6 @@ DB_HOST: str = "database"
 DB_PORT: int = 5432
 DB_NAME: str = "database"
 ALLOW_REGISTRATION: bool = True
+JWT_SECRET_KEY: str = "secret"
+JWT_ALGORITHM: str = "HS256"
+JWT_EXPIRATION: int = 3600
