@@ -22,4 +22,9 @@ for router in ROUTERS:
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Welcome to Remedi!"}
+
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy"}
