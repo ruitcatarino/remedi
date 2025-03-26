@@ -11,6 +11,3 @@ class MedicationLog(Model):
     notes = fields.TextField(null=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
-
-    class Meta:
-        table = "medications_logs"

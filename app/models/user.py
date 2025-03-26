@@ -14,9 +14,6 @@ class User(Model):
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 
-    class Meta:
-        table = "users"
-
     @classmethod
     async def register(cls, password: str, **kwargs):
         return await super().create(

@@ -3,7 +3,7 @@ from tortoise import BaseDBAsyncClient
 
 async def upgrade(db: BaseDBAsyncClient) -> str:
     return """
-        CREATE TABLE IF NOT EXISTS "users" (
+        CREATE TABLE IF NOT EXISTS "user" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "email" VARCHAR(50) NOT NULL UNIQUE,
     "password" VARCHAR(130) NOT NULL,
@@ -13,16 +13,16 @@ async def upgrade(db: BaseDBAsyncClient) -> str:
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE TABLE IF NOT EXISTS "persons" (
+CREATE TABLE IF NOT EXISTS "person" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "name" VARCHAR(50) NOT NULL,
     "birth_date" DATE NOT NULL,
     "notes" TEXT,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "user_id" INT NOT NULL REFERENCES "users" ("id") ON DELETE CASCADE
+    "user_id" INT NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE
 );
-CREATE TABLE IF NOT EXISTS "medications" (
+CREATE TABLE IF NOT EXISTS "medication" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "name" VARCHAR(50) NOT NULL,
     "dosage" VARCHAR(50) NOT NULL,
@@ -33,9 +33,9 @@ CREATE TABLE IF NOT EXISTS "medications" (
     "notes" TEXT,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "person_id" INT NOT NULL REFERENCES "persons" ("id") ON DELETE CASCADE
+    "person_id" INT NOT NULL REFERENCES "person" ("id") ON DELETE CASCADE
 );
-CREATE TABLE IF NOT EXISTS "medications_logs" (
+CREATE TABLE IF NOT EXISTS "medicationlog" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "schedule" BIGINT NOT NULL,
     "taken_at" TIMESTAMPTZ NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS "medications_logs" (
     "notes" TEXT,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "medication_id" INT NOT NULL REFERENCES "medications" ("id") ON DELETE CASCADE
+    "medication_id" INT NOT NULL REFERENCES "medication" ("id") ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "aerich" (
     "id" SERIAL NOT NULL PRIMARY KEY,
