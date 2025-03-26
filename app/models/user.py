@@ -31,7 +31,7 @@ class User(Model):
         return await cls.get(id=payload["id"], email=payload["email"])
 
     @property
-    def jwt(self) -> str:
+    def access_token(self) -> str:
         return jwt.encode(
             {
                 "email": self.email,
