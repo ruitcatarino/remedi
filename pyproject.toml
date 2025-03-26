@@ -1,30 +1,12 @@
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "remedi"
-version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-license = { file = "LICENSE" }
-requires-python = ">=3.13"
-dependencies = [
-    "email-validator>=2.2.0",
-    "fastapi>=0.115.12",
-    "pydantic>=2.10.6",
-    "pyttings>=2.1.0",
-    "tortoise-orm[asyncpg]>=0.24.2",
-    "uvicorn>=0.34.0",
+requires = [
+    "hatchling",
 ]
+build-backend = "hatchling.build"
 
-[dependency-groups]
-dev = [
-    "mypy>=1.15.0",
-    "pytest-asyncio>=0.26.0",
-    "pytest>=8.3.5",
-    "ruff>=0.11.2",
-    "coverage>=7.7.1",
+[tool.hatch.build.targets.wheel]
+packages = [
+    "remedi",
 ]
 
 [tool.ruff]
@@ -37,14 +19,45 @@ quote-style = "double"
 
 [tool.ruff.lint]
 extend-select = [
-    "E",      # https://docs.astral.sh/ruff/rules/#error-e
-    "I",      # https://docs.astral.sh/ruff/rules/#isort-i
-    "FA",     # https://docs.astral.sh/ruff/rules/#flake8-future-annotations-fa
-    "UP",     # https://docs.astral.sh/ruff/rules/#pyupgrade-up
-    "RUF100", # https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
+    "E",
+    "I",
+    "FA",
+    "UP",
+    "RUF100",
+]
+
+[tool.aerich]
+tortoise_orm = "app.database.TORTOISE_ORM"
+location = "./app/migrations"
+src_folder = "./."
+
+[project]
+name = "remedi"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.13"
+dependencies = [
+    "aerich[toml]>=0.8.2",
+    "email-validator>=2.2.0",
+    "fastapi>=0.115.12",
+    "pydantic>=2.10.6",
+    "pyttings>=2.1.0",
+    "tortoise-orm[asyncpg]>=0.24.2",
+    "uvicorn>=0.34.0",
 ]
 
 [project.urls]
 Homepage = "https://github.com/ruitcatarino/remedi"
 Repository = "https://github.com/ruitcatarino/remedi"
 Issues = "https://github.com/ruitcatarino/remedi/issues"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+    "pytest-asyncio>=0.26.0",
+    "pytest>=8.3.5",
+    "ruff>=0.11.2",
+    "coverage>=7.7.1",
+]
