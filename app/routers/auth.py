@@ -25,7 +25,7 @@ class LoginError(HTTPException):
 
 
 @router.post("/register")
-async def register(user_model: UserSchema):
+async def register(user_model: UserSchema) -> dict:
     if settings.ALLOW_REGISTRATION is False or await User.exists(
         email=user_model.email
     ):
@@ -36,7 +36,7 @@ async def register(user_model: UserSchema):
 
 
 @router.post("/login")
-async def login(user_model: UserLoginSchema):
+async def login(user_model: UserLoginSchema) -> dict:
     user = await User.get_or_none(email=user_model.email)
 
     if user is None or not await user.check_password(user_model.password):

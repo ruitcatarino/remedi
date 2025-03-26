@@ -1,10 +1,14 @@
-import hashlib
+import contextlib
 import time
 
 import jwt
+from argon2 import PasswordHasher
+from argon2.exceptions import VerificationError
 from pyttings import settings
 from tortoise import fields
 from tortoise.models import Model
+
+ph = PasswordHasher()
 
 
 class User(Model):
@@ -44,7 +48,9 @@ class User(Model):
 
     @staticmethod
     async def _hash_password(password: str) -> str:
-        return hashlib.sha512(password.encode("utf-8")).hexdigest()
+        return ph.hash(password)
 
     async def check_password(self, password: str) -> bool:
-        return await self._hash_password(password) == self.password
+        with contextlib.suppress(VerificationError):
+            return ph.verify(self.password, password)
+        return False
