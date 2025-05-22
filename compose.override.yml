@@ -1,0 +1,11 @@
+services:
+  remedi:
+    build:
+      context: .
+      target: dev
+    volumes:
+      - ./app:/opt/project/app
+      - ./tests:/opt/project/tests
+    ports:
+      - "8000:8000"
+      
