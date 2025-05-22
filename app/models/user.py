@@ -12,7 +12,7 @@ ph = PasswordHasher()
 
 
 class User(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     email = fields.CharField(max_length=50, unique=True)
     password = fields.CharField(max_length=130)
     name = fields.CharField(max_length=50)

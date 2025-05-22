@@ -3,7 +3,7 @@ from tortoise.models import Model
 
 
 class Person(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     user = fields.ForeignKeyField("models.User", related_name="persons")
     name = fields.CharField(max_length=50)
     birth_date = fields.DateField()

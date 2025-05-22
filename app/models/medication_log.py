@@ -3,7 +3,7 @@ from tortoise.models import Model
 
 
 class MedicationLog(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     medication = fields.ForeignKeyField("models.Medication", related_name="logs")
     schedule = fields.TimeDeltaField()
     taken_at = fields.DatetimeField()
