@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pyttings import settings
 
+from app.auth import get_user
 from app.models.user import User
 from app.schemas.user import UserLoginSchema, UserSchema
 
@@ -45,4 +46,16 @@ async def login(user_model: UserLoginSchema) -> dict:
     return {
         "message": "User logged in successfully",
         "token": user.access_token,
+    }
+
+
+@router.post("/logout")
+async def logout(current_user: User = Depends(get_user)) -> dict:
+    """
+    Logout endpoint that requires JWT authentication.
+    """
+    # TODO: Blacklist the token
+    return {
+        "message": f"User {current_user.email} logged out successfully",
+        "user_id": current_user.id,
     }
