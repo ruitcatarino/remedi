@@ -48,7 +48,4 @@ async def logout(credentials: HTTPAuthorizationCredentials = Depends(security)) 
     current_user: User = await get_user(credentials)
     await BlacklistedToken.blacklist_token(credentials.credentials, current_user)
 
-    return {
-        "message": f"User {current_user.email} logged out successfully",
-        "user_id": current_user.id,
-    }
+    return {"message": f"User {current_user.email} logged out successfully"}
