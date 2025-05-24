@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jwt.exceptions import DecodeError, ExpiredSignatureError
 
+from app.models.token_blacklist import BlacklistedToken
 from app.models.user import User
 
 security = HTTPBearer()
@@ -22,10 +22,10 @@ async def get_user(
     """
     token = credentials.credentials
 
+    if BlacklistedToken.is_token_blacklisted(token):
+        raise AuthenticationError
+
     try:
-        user = await User.from_jwt(token)
-        return user
-    except (DecodeError, ExpiredSignatureError):
-        raise AuthenticationError("Invalid or expired token")
+        return await User.from_jwt(token)
     except Exception:
-        raise AuthenticationError("User not found or token invalid")
+        raise AuthenticationError
