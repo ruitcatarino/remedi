@@ -4,8 +4,9 @@ import pytest_asyncio
 from tortoise import Tortoise
 
 
-@pytest_asyncio.fixture(autouse=True)
+@pytest_asyncio.fixture(scope="function", autouse=True)
 async def initialize_tests():
+    """Initialize the database for each test. Clean up after each test."""
     await Tortoise.init(
         db_url="sqlite://:memory:", modules={"models": ["app.models", "aerich.models"]}
     )
