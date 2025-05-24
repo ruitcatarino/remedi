@@ -15,6 +15,7 @@ router = APIRouter(
 
 @router.post("/register")
 async def register(user_model: UserSchema) -> dict:
+    """Register endpoint."""
     if settings.ALLOW_REGISTRATION is False or await User.exists(
         email=user_model.email
     ):
@@ -26,6 +27,7 @@ async def register(user_model: UserSchema) -> dict:
 
 @router.post("/login")
 async def login(user_model: UserLoginSchema) -> dict:
+    """Login endpoint."""
     user = await User.get_or_none(email=user_model.email)
 
     if user is None or not await user.check_password(user_model.password):
@@ -39,9 +41,7 @@ async def login(user_model: UserLoginSchema) -> dict:
 
 @router.post("/logout")
 async def logout(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
-    """
-    Logout endpoint that requires JWT authentication.
-    """
+    """Logout endpoint, requires a valid JWT."""
     if await BlacklistedToken.is_token_blacklisted(credentials.credentials):
         raise HTTPException(status_code=401, detail="Logout error")
 
