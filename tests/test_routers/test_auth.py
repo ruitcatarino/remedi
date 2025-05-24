@@ -60,3 +60,70 @@ async def test_invalid_login(async_client):
     print(response.__dict__)
     assert response.status_code == 401
     assert response.json() == {"detail": "Login error"}
+
+
+@pytest.mark.asyncio
+async def test_logout(async_client, sample_user_data):
+    response = await async_client.post("/auth/register", json=sample_user_data)
+    assert response.status_code == 200
+    assert response.json() == {"message": "User registered successfully"}
+
+    response = await async_client.post(
+        "/auth/login",
+        json={
+            "email": sample_user_data["email"],
+            "password": sample_user_data["password"],
+        },
+    )
+    assert response.status_code == 200
+    token = response.json()["token"]
+    assert response.json() == {"message": "User logged in successfully", "token": token}
+
+    response = await async_client.post(
+        "/auth/logout", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "message": f"User {sample_user_data['email']} logged out successfully"
+    }
+
+
+@pytest.mark.asyncio
+async def test_logout_with_blacklisted_token(async_client, sample_user_data):
+    response = await async_client.post("/auth/register", json=sample_user_data)
+    assert response.status_code == 200
+    assert response.json() == {"message": "User registered successfully"}
+
+    response = await async_client.post(
+        "/auth/login",
+        json={
+            "email": sample_user_data["email"],
+            "password": sample_user_data["password"],
+        },
+    )
+    assert response.status_code == 200
+    token = response.json()["token"]
+    assert response.json() == {"message": "User logged in successfully", "token": token}
+
+    response = await async_client.post(
+        "/auth/logout", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "message": f"User {sample_user_data['email']} logged out successfully"
+    }
+
+    response = await async_client.post(
+        "/auth/logout", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Logout error"}
+
+
+@pytest.mark.asyncio
+async def test_logout_invalid_token(async_client):
+    response = await async_client.post(
+        "/auth/logout", headers={"Authorization": "Bearer invalid_token"}
+    )
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Authentication failed"}
