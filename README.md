@@ -1,3 +1,3 @@
 <p align="center">
-<img src="artwork/logo.png" width="300" title="Remedi">
+<img src="artwork/logo.png" width="400" title="Remedi">
 </p>
