@@ -1,7 +1,4 @@
 import pytest
-from httpx import ASGITransport, AsyncClient
-
-from app.main import app
 
 
 @pytest.fixture
@@ -17,27 +14,49 @@ def sample_user_data():
 
 
 @pytest.mark.asyncio
-async def test_register(sample_user_data):
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as ac:
-        response = await ac.post("/auth/register", json=sample_user_data)
+async def test_register(async_client, sample_user_data):
+    response = await async_client.post("/auth/register", json=sample_user_data)
     assert response.status_code == 200
     assert response.json() == {"message": "User registered successfully"}
 
 
 @pytest.mark.asyncio
-async def test_register_duplicated(sample_user_data):
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as ac:
-        response = await ac.post("/auth/register", json=sample_user_data)
+async def test_register_duplicated(async_client, sample_user_data):
+    response = await async_client.post("/auth/register", json=sample_user_data)
     assert response.status_code == 200
     assert response.json() == {"message": "User registered successfully"}
 
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as ac:
-        response = await ac.post("/auth/register", json=sample_user_data)
+    response = await async_client.post("/auth/register", json=sample_user_data)
     assert response.status_code == 400
     assert response.json() == {"detail": "Registration error"}
+
+
+@pytest.mark.asyncio
+async def test_login(async_client, sample_user_data):
+    response = await async_client.post("/auth/register", json=sample_user_data)
+    assert response.status_code == 200
+    assert response.json() == {"message": "User registered successfully"}
+
+    response = await async_client.post(
+        "/auth/login",
+        json={
+            "email": sample_user_data["email"],
+            "password": sample_user_data["password"],
+        },
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "message": "User logged in successfully",
+        "token": response.json()["token"],
+    }
+
+
+@pytest.mark.asyncio
+async def test_invalid_login(async_client):
+    response = await async_client.post(
+        "/auth/login",
+        json={"email": "wrong_email@example.com", "password": "wrong_password"},
+    )
+    print(response.__dict__)
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Login error"}
