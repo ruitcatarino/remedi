@@ -1,6 +1,6 @@
 import hashlib
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import jwt
 from pyttings import settings
@@ -29,17 +29,14 @@ class BlacklistedToken(Model):
     async def blacklist_token(
         cls, token: str, user: User, reason: str = "logout"
     ) -> "BlacklistedToken":
-        """Add a token to the blacklist."""
-        try:
-            payload = jwt.decode(
-                token,
-                settings.JWT_SECRET_KEY,
-                algorithms=[settings.JWT_ALGORITHM],
-                options={"verify_exp": False},
-            )
-            expires_at = datetime.fromtimestamp(payload.get("exp", time.time()))
-        except Exception:
-            expires_at = datetime.now() + timedelta(seconds=settings.JWT_EXPIRATION)
+        """Add a token to the blacklist. Token must be a valid JWT token."""
+        payload = jwt.decode(
+            token,
+            settings.JWT_SECRET_KEY,
+            algorithms=[settings.JWT_ALGORITHM],
+            options={"verify_exp": False},
+        )
+        expires_at = datetime.fromtimestamp(payload.get("exp", time.time()))
 
         blacklisted_token, _ = await cls.get_or_create(
             token_hash=hashlib.sha256(token.encode()).hexdigest(),

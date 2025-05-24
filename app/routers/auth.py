@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials
 from pyttings import settings
 
-from app.auth import get_user
+from app.auth import get_user, security
+from app.models.token_blacklist import BlacklistedToken
 from app.models.user import User
 from app.schemas.user import UserLoginSchema, UserSchema
 
@@ -11,26 +13,12 @@ router = APIRouter(
 )
 
 
-class RegisterError(HTTPException):
-    """Generic exception for registration errors."""
-
-    def __init__(self):
-        super().__init__(status_code=400, detail="Registration error")
-
-
-class LoginError(HTTPException):
-    """Generic exception for login errors."""
-
-    def __init__(self):
-        super().__init__(status_code=401, detail="Login error")
-
-
 @router.post("/register")
 async def register(user_model: UserSchema) -> dict:
     if settings.ALLOW_REGISTRATION is False or await User.exists(
         email=user_model.email
     ):
-        raise RegisterError
+        raise HTTPException(status_code=400, detail="Registration error")
 
     await User.register(**user_model.model_dump())
     return {"message": "User registered successfully"}
@@ -41,7 +29,7 @@ async def login(user_model: UserLoginSchema) -> dict:
     user = await User.get_or_none(email=user_model.email)
 
     if user is None or not await user.check_password(user_model.password):
-        raise LoginError
+        raise HTTPException(status_code=401, detail="Login error")
 
     return {
         "message": "User logged in successfully",
@@ -50,11 +38,16 @@ async def login(user_model: UserLoginSchema) -> dict:
 
 
 @router.post("/logout")
-async def logout(current_user: User = Depends(get_user)) -> dict:
+async def logout(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
     """
     Logout endpoint that requires JWT authentication.
     """
-    # TODO: Blacklist the token
+    if await BlacklistedToken.is_token_blacklisted(credentials.credentials):
+        raise HTTPException(status_code=401, detail="Logout error")
+
+    current_user: User = await get_user(credentials)
+    await BlacklistedToken.blacklist_token(credentials.credentials, current_user)
+
     return {
         "message": f"User {current_user.email} logged out successfully",
         "user_id": current_user.id,

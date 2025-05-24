@@ -1,5 +1,7 @@
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jwt import InvalidTokenError
+from tortoise.exceptions import DoesNotExist, MultipleObjectsReturned
 
 from app.models.token_blacklist import BlacklistedToken
 from app.models.user import User
@@ -22,10 +24,10 @@ async def get_user(
     """
     token = credentials.credentials
 
-    if BlacklistedToken.is_token_blacklisted(token):
+    if await BlacklistedToken.is_token_blacklisted(token):
         raise AuthenticationError
 
     try:
         return await User.from_jwt(token)
-    except Exception:
+    except (InvalidTokenError, DoesNotExist, MultipleObjectsReturned):
         raise AuthenticationError
