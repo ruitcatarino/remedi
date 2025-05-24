@@ -55,5 +55,5 @@ class User(Model):
             return ph.verify(self.password, password)
         return False
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"User(id={self.id}, email={self.email}, name={self.name})"

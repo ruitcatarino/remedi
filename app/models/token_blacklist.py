@@ -60,5 +60,5 @@ class BlacklistedToken(Model):
         """
         await cls.filter(expires_at__lt=datetime.now()).delete()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"BlacklistedToken(user={self.user}, expires_at={self.expires_at})"
