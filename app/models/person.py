@@ -4,7 +4,7 @@ from tortoise.models import Model
 
 class Person(Model):
     id = fields.IntField(primary_key=True)
-    user = fields.ForeignKeyField("models.User", related_name="persons")
+    user = fields.ForeignKeyField("models.User", related_name="persons", db_index=True)
     name = fields.CharField(max_length=50)
     birth_date = fields.DateField()
     notes = fields.TextField(null=True)

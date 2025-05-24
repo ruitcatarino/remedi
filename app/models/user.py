@@ -54,3 +54,6 @@ class User(Model):
         with contextlib.suppress(VerificationError):
             return ph.verify(self.password, password)
         return False
+
+    def __str__(self):
+        return f"User(id={self.id}, email={self.email}, name={self.name})"
