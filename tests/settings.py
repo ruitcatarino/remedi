@@ -3,6 +3,7 @@ DB_PASSWORD: str = "password"
 DB_HOST: str = "database"
 DB_PORT: int = 5432
 DB_NAME: str = "database"
+MAINTENANCE_MODE: bool = False
 ALLOW_REGISTRATION: bool = True
 JWT_SECRET_KEY: str = "secret"
 JWT_ALGORITHM: str = "HS256"
