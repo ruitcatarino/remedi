@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS "person" (
     "notes" TEXT,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "user_id" INT NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE
+    "user_id" INT NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
+    CONSTRAINT "uid_person_user_id_de8894" UNIQUE ("user_id", "name")
 );
 CREATE INDEX IF NOT EXISTS "idx_person_user_id_b150dd" ON "person" ("user_id");
 CREATE TABLE IF NOT EXISTS "medication" (
