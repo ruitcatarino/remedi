@@ -1,3 +1,3 @@
-from app.routers import auth
+from app.routers import auth, person
 
-ROUTERS = [auth.router]
+ROUTERS = [auth.router, person.router]
