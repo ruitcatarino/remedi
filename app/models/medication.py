@@ -9,13 +9,18 @@ class Medication(Model):
     )
     name = fields.CharField(max_length=50)
     dosage = fields.CharField(max_length=50)
+    is_prn = fields.BooleanField(
+        default=False, db_index=True
+    )  # not scheduled, as needed
     frequency = fields.TimeDeltaField()
     start_date = fields.DateField()
-    end_date = fields.DateField(null=True, db_index=True)
+    end_date = fields.DateField(null=True)
     total_doses = fields.IntField(null=True)
+    doses_taken = fields.IntField(default=0)
+    is_active = fields.BooleanField(default=True, db_index=True)
     notes = fields.TextField(null=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 
     class Meta:
-        indexes = [("start_date", "end_date")]
+        indexes = [("start_date", "end_date", "is_active", "is_prn")]

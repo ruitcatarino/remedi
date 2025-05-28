@@ -10,9 +10,11 @@ async def upgrade(db: BaseDBAsyncClient) -> str:
     "name" VARCHAR(50) NOT NULL,
     "phone_number" VARCHAR(50) NOT NULL,
     "birth_date" DATE NOT NULL,
+    "is_active" BOOL NOT NULL DEFAULT True,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX IF NOT EXISTS "idx_user_is_acti_83722a" ON "user" ("is_active");
 CREATE TABLE IF NOT EXISTS "blacklisted_tokens" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "token_hash" VARCHAR(64) NOT NULL UNIQUE,
@@ -40,31 +42,48 @@ CREATE TABLE IF NOT EXISTS "medication" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "name" VARCHAR(50) NOT NULL,
     "dosage" VARCHAR(50) NOT NULL,
+    "is_prn" BOOL NOT NULL DEFAULT False,
     "frequency" BIGINT NOT NULL,
     "start_date" DATE NOT NULL,
     "end_date" DATE,
     "total_doses" INT,
+    "doses_taken" INT NOT NULL DEFAULT 0,
+    "is_active" BOOL NOT NULL DEFAULT True,
     "notes" TEXT,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "person_id" INT NOT NULL REFERENCES "person" ("id") ON DELETE CASCADE
 );
-CREATE INDEX IF NOT EXISTS "idx_medication_end_dat_9e3376" ON "medication" ("end_date");
+CREATE INDEX IF NOT EXISTS "idx_medication_is_prn_e12ab5" ON "medication" ("is_prn");
+CREATE INDEX IF NOT EXISTS "idx_medication_is_acti_11ec62" ON "medication" ("is_active");
 CREATE INDEX IF NOT EXISTS "idx_medication_person__c6b4db" ON "medication" ("person_id");
-CREATE INDEX IF NOT EXISTS "idx_medication_start_d_f95688" ON "medication" ("start_date", "end_date");
+CREATE INDEX IF NOT EXISTS "idx_medication_start_d_77927a" ON "medication" ("start_date", "end_date", "is_active", "is_prn");
+CREATE TABLE IF NOT EXISTS "medicationschedule" (
+    "id" SERIAL NOT NULL PRIMARY KEY,
+    "scheduled_datetime" TIMESTAMPTZ NOT NULL,
+    "status" VARCHAR(10) NOT NULL DEFAULT 'scheduled',
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "medication_id" INT NOT NULL REFERENCES "medication" ("id") ON DELETE CASCADE,
+    CONSTRAINT "uid_medications_medicat_6f302b" UNIQUE ("medication_id", "scheduled_datetime")
+);
+CREATE INDEX IF NOT EXISTS "idx_medications_schedul_942109" ON "medicationschedule" ("scheduled_datetime");
+CREATE INDEX IF NOT EXISTS "idx_medications_medicat_054012" ON "medicationschedule" ("medication_id");
+CREATE INDEX IF NOT EXISTS "idx_medications_medicat_5a6f1d" ON "medicationschedule" ("medication_id", "status");
+CREATE INDEX IF NOT EXISTS "idx_medications_schedul_e9f4dd" ON "medicationschedule" ("scheduled_datetime", "status");
+COMMENT ON COLUMN "medicationschedule"."status" IS 'SCHEDULED: scheduled\nNOTIFIED: notified\nTAKEN: taken\nLATE_TAKEN: late_taken\nSKIPPED: skipped\nMISSED: missed';
 CREATE TABLE IF NOT EXISTS "medicationlog" (
     "id" SERIAL NOT NULL PRIMARY KEY,
-    "schedule" BIGINT NOT NULL,
     "taken_at" TIMESTAMPTZ NOT NULL,
-    "skipped" BOOL NOT NULL DEFAULT False,
     "notes" TEXT,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "medication_id" INT NOT NULL REFERENCES "medication" ("id") ON DELETE CASCADE
+    "medication_id" INT NOT NULL REFERENCES "medication" ("id") ON DELETE CASCADE,
+    "schedule_id" INT REFERENCES "medicationschedule" ("id") ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS "idx_medicationl_taken_a_bf0a58" ON "medicationlog" ("taken_at");
 CREATE INDEX IF NOT EXISTS "idx_medicationl_medicat_0bdc55" ON "medicationlog" ("medication_id");
-CREATE INDEX IF NOT EXISTS "idx_medicationl_medicat_001164" ON "medicationlog" ("medication_id", "skipped");
+CREATE INDEX IF NOT EXISTS "idx_medicationl_medicat_e3b015" ON "medicationlog" ("medication_id", "taken_at");
 CREATE TABLE IF NOT EXISTS "aerich" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "version" VARCHAR(255) NOT NULL,

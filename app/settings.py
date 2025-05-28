@@ -22,5 +22,6 @@ LOG_LEVEL: str = "INFO"
 # Configs
 ALLOW_REGISTRATION: bool = True
 MAINTENANCE_MODE: bool = False
-REMINDER_INTERVAL: int = 1 # in minutes
-MISSED_INTERVAL: int = 5 # in minutes
+REMINDER_GENERATION_INTERVAL: int = 12  # in hours
+REMINDER_CHECK_INTERVAL: int = 1  # in minutes
+MISSED_INTERVAL: int = 5  # in minutes

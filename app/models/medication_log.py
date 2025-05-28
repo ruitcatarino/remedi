@@ -7,12 +7,13 @@ class MedicationLog(Model):
     medication = fields.ForeignKeyField(
         "models.Medication", related_name="logs", db_index=True
     )
-    schedule = fields.TimeDeltaField()
+    schedule = fields.ForeignKeyField(
+        "models.MedicationSchedule", related_name="log", null=True
+    )
     taken_at = fields.DatetimeField(db_index=True)
-    skipped = fields.BooleanField(default=False)
     notes = fields.TextField(null=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 
     class Meta:
-        indexes = [("medication", "skipped")]
+        indexes = [("medication", "taken_at")]
