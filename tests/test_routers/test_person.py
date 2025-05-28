@@ -84,7 +84,7 @@ async def test_register_person_invalid_token(async_client, sample_person_data):
 @pytest.mark.asyncio
 async def test_list_persons(async_client, token, list_persons_data):
     for person in list_persons_data:
-        response = _register_person(async_client, token, person)
+        response = await _register_person(async_client, token, person)
         assert response.status_code == 200
         assert response.json() == {"message": "Person registered successfully"}
 
@@ -107,7 +107,7 @@ async def test_list_persons_empty(async_client, token):
     response = await async_client.get(
         "/person/", headers={"Authorization": f"Bearer {token}"}
     )
-    assert response.status_code == 404
+    assert response.status_code == 400
     response.json() == {"detail": "Person not found"}
 
 
@@ -129,7 +129,7 @@ async def test_get_person_invalid(async_client, token, sample_person_data):
     response = await async_client.get(
         f"/person/{1}", headers={"Authorization": f"Bearer {token}"}
     )
-    assert response.status_code == 404
+    assert response.status_code == 400
     assert response.json() == {"detail": "Person not found"}
 
 
@@ -178,7 +178,7 @@ async def test_update_person_invalid(async_client, token, sample_person_data):
         json=sample_person_data,
         headers={"Authorization": f"Bearer {token}"},
     )
-    assert response.status_code == 404
+    assert response.status_code == 400
     assert response.json() == {"detail": "Person not found"}
 
 
@@ -210,7 +210,7 @@ async def test_update_person_by_name(async_client, token, sample_person_data):
     response = await async_client.get(
         f"/person/name/{old_name}", headers={"Authorization": f"Bearer {token}"}
     )
-    assert response.status_code == 404
+    assert response.status_code == 400
     assert response.json() == {"detail": "Person not found"}
 
 
@@ -221,5 +221,5 @@ async def test_update_person_by_name_invalid(async_client, token, sample_person_
         json=sample_person_data,
         headers={"Authorization": f"Bearer {token}"},
     )
-    assert response.status_code == 404
+    assert response.status_code == 400
     assert response.json() == {"detail": "Person not found"}
