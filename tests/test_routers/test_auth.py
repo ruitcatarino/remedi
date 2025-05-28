@@ -57,7 +57,6 @@ async def test_invalid_login(async_client):
         "/auth/login",
         json={"email": "wrong_email@example.com", "password": "wrong_password"},
     )
-    print(response.__dict__)
     assert response.status_code == 401
     assert response.json() == {"detail": "Login error"}
 
