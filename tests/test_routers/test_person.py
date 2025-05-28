@@ -121,7 +121,7 @@ async def test_get_person(async_client, token, sample_person_data):
         f"/person/{1}", headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 200
-    assert response.json() == sample_person_data
+    assert response.json() == sample_person_data | {"id": 1}
 
 
 @pytest.mark.asyncio
@@ -144,7 +144,7 @@ async def test_get_person_by_name(async_client, token, sample_person_data):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 200
-    assert response.json() == sample_person_data
+    assert response.json() == sample_person_data | {"id": 1}
 
 
 @pytest.mark.asyncio
@@ -162,13 +162,13 @@ async def test_update_person(async_client, token, sample_person_data):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 200
-    assert response.json() == sample_person_data
+    assert response.json() == sample_person_data | {"id": 1}
 
     response = await async_client.get(
         f"/person/{1}", headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 200
-    assert response.json() == sample_person_data
+    assert response.json() == sample_person_data | {"id": 1}
 
 
 @pytest.mark.asyncio
@@ -198,14 +198,14 @@ async def test_update_person_by_name(async_client, token, sample_person_data):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 200
-    assert response.json() == sample_person_data
+    assert response.json() == sample_person_data | {"id": 1}
 
     response = await async_client.get(
         f"/person/name/{sample_person_data['name']}",
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 200
-    assert response.json() == sample_person_data
+    assert response.json() == sample_person_data | {"id": 1}
 
     response = await async_client.get(
         f"/person/name/{old_name}", headers={"Authorization": f"Bearer {token}"}

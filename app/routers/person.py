@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.auth import get_user
 from app.models.person import Person
 from app.models.user import User
-from app.schemas.person import PersonFullSchema, PersonSchema, PersonUpdateSchema
+from app.schemas.person import PersonRegisterSchema, PersonSchema, PersonUpdateSchema
 
 router = APIRouter(
     prefix="/person",
@@ -17,7 +17,7 @@ class PersonException(HTTPException):
 
 
 @router.post("/register")
-async def register(person_model: PersonSchema, user: User = Depends(get_user)) -> dict:
+async def register(person_model: PersonRegisterSchema, user: User = Depends(get_user)):
     """Register a person endpoint."""
 
     if await Person.exists(user=user, name=person_model.name):
@@ -28,7 +28,7 @@ async def register(person_model: PersonSchema, user: User = Depends(get_user)) -
     return {"message": "Person registered successfully"}
 
 
-@router.get("/", response_model=list[PersonFullSchema])
+@router.get("/", response_model=list[PersonSchema])
 async def get_persons(user: User = Depends(get_user)):
     persons = await Person.filter(user=user).all()
     if not persons:
