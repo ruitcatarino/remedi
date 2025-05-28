@@ -79,6 +79,17 @@ async def test_register_person_duplicated(async_client, token, sample_person_dat
 
 
 @pytest.mark.asyncio
+async def test_register_person_invalid_token(async_client, sample_person_data):
+    response = await async_client.post(
+        "/person/register",
+        json=sample_person_data,
+        headers={"Authorization": "Bearer invalid_token"},
+    )
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Authentication failed"}
+
+
+@pytest.mark.asyncio
 async def test_list_persons(async_client, token, list_persons_data):
     for person in list_persons_data:
         response = await async_client.post(
@@ -101,3 +112,143 @@ async def test_list_persons(async_client, token, list_persons_data):
             "birth_date": person["birth_date"],
             "notes": person.get("notes"),
         }
+
+
+@pytest.mark.asyncio
+async def test_list_persons_empty(async_client, token):
+    response = await async_client.get(
+        "/person/", headers={"Authorization": f"Bearer {token}"}
+    )
+    print(response.json())
+    assert response.status_code == 404
+    response.json() == {"detail": "Person not found"}
+
+
+@pytest.mark.asyncio
+async def test_get_person(async_client, token, sample_person_data):
+    response = await async_client.post(
+        "/person/register",
+        json=sample_person_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"message": "Person registered successfully"}
+
+    response = await async_client.get(
+        f"/person/{1}", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+    assert response.json() == sample_person_data
+
+
+@pytest.mark.asyncio
+async def test_get_person_invalid(async_client, token, sample_person_data):
+    response = await async_client.get(
+        f"/person/{1}", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Person not found"}
+
+
+@pytest.mark.asyncio
+async def test_get_person_by_name(async_client, token, sample_person_data):
+    response = await async_client.post(
+        "/person/register",
+        json=sample_person_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"message": "Person registered successfully"}
+
+    response = await async_client.get(
+        f"/person/name/{sample_person_data['name']}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == sample_person_data
+
+
+@pytest.mark.asyncio
+async def test_update_person(async_client, token, sample_person_data):
+    response = await async_client.post(
+        "/person/register",
+        json=sample_person_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"message": "Person registered successfully"}
+
+    sample_person_data["name"] = "Updated Name"
+    sample_person_data["birth_date"] = "2000-01-01"
+    sample_person_data["notes"] = "Updated notes"
+    response = await async_client.put(
+        f"/person/{1}",
+        json=sample_person_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == sample_person_data
+
+    response = await async_client.get(
+        f"/person/{1}", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+    assert response.json() == sample_person_data
+
+
+@pytest.mark.asyncio
+async def test_update_person_invalid(async_client, token, sample_person_data):
+    response = await async_client.put(
+        f"/person/{1}",
+        json=sample_person_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Person not found"}
+
+
+@pytest.mark.asyncio
+async def test_update_person_by_name(async_client, token, sample_person_data):
+    response = await async_client.post(
+        "/person/register",
+        json=sample_person_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"message": "Person registered successfully"}
+
+    old_name = sample_person_data["name"]
+    sample_person_data["name"] = "Updated Name"
+    sample_person_data["birth_date"] = "2000-01-01"
+    sample_person_data["notes"] = "Updated notes"
+    response = await async_client.put(
+        f"/person/name/{old_name}",
+        json=sample_person_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == sample_person_data
+
+    response = await async_client.get(
+        f"/person/name/{sample_person_data['name']}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == sample_person_data
+
+    response = await async_client.get(
+        f"/person/name/{old_name}", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Person not found"}
+
+
+@pytest.mark.asyncio
+async def test_update_person_by_name_invalid(async_client, token, sample_person_data):
+    response = await async_client.put(
+        f"/person/name/{sample_person_data['name']}",
+        json=sample_person_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Person not found"}
