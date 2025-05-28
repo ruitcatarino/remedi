@@ -10,6 +10,7 @@ async def upgrade(db: BaseDBAsyncClient) -> str:
     "name" VARCHAR(50) NOT NULL,
     "phone_number" VARCHAR(50) NOT NULL,
     "birth_date" DATE NOT NULL,
+    "timezone" VARCHAR(50) NOT NULL DEFAULT 'UTC',
     "disabled" BOOL NOT NULL DEFAULT False,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -42,8 +43,8 @@ CREATE TABLE IF NOT EXISTS "medication" (
     "name" VARCHAR(50) NOT NULL,
     "dosage" VARCHAR(50) NOT NULL,
     "is_prn" BOOL NOT NULL DEFAULT False,
-    "start_date" DATE NOT NULL,
-    "end_date" DATE,
+    "start_date" TIMESTAMPTZ NOT NULL,
+    "end_date" TIMESTAMPTZ,
     "frequency" BIGINT,
     "total_doses" INT,
     "doses_taken" INT NOT NULL DEFAULT 0,
@@ -66,7 +67,6 @@ CREATE TABLE IF NOT EXISTS "medicationschedule" (
     "medication_id" INT NOT NULL REFERENCES "medication" ("id") ON DELETE CASCADE,
     CONSTRAINT "uid_medications_medicat_6f302b" UNIQUE ("medication_id", "scheduled_datetime")
 );
-CREATE INDEX IF NOT EXISTS "idx_medications_schedul_942109" ON "medicationschedule" ("scheduled_datetime");
 CREATE INDEX IF NOT EXISTS "idx_medications_medicat_054012" ON "medicationschedule" ("medication_id");
 CREATE INDEX IF NOT EXISTS "idx_medications_medicat_5a6f1d" ON "medicationschedule" ("medication_id", "status");
 CREATE INDEX IF NOT EXISTS "idx_medications_schedul_e9f4dd" ON "medicationschedule" ("scheduled_datetime", "status");

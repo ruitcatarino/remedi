@@ -12,8 +12,8 @@ class Medication(Model):
     is_prn = fields.BooleanField(
         default=False, db_index=True
     )  # not scheduled, as needed
-    start_date = fields.DateField()
-    end_date = fields.DateField(null=True)
+    start_date = fields.DatetimeField()
+    end_date = fields.DatetimeField(null=True)
     frequency = fields.TimeDeltaField(null=True)
     total_doses = fields.IntField(null=True)
     doses_taken = fields.IntField(default=0)

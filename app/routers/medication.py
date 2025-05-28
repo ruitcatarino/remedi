@@ -2,10 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.auth import get_user
 from app.models.medication import Medication
+from app.models.medication_schedule import MedicationSchedule
 from app.models.person import Person
 from app.models.user import User
 from app.routers.person import PersonException
 from app.schemas.medication import MedicationRegisterSchema, MedicationSchema
+from app.utils.date import to_utc
 
 router = APIRouter(
     prefix="/medication",
@@ -20,7 +22,11 @@ async def register(
     person = await Person.get_or_none(user=user, id=medication_model.person_id)
     if person is None:
         raise PersonException
-    await Medication.create(person=person, **medication_model.model_dump())
+    medication_model.start_date = to_utc(medication_model.start_date, user.timezone)
+    if medication_model.end_date:
+        medication_model.end_date = to_utc(medication_model.end_date, user.timezone)
+    medication = await Medication.create(person=person, **medication_model.model_dump())
+    await MedicationSchedule.init_medication_schedules(medication)
     return {"message": "Medication registered successfully"}
 
 
