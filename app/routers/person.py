@@ -61,7 +61,7 @@ async def update_person(
     if person is None:
         raise PersonException
 
-    for attr, value in person_model.model_dump(exclude_none=True).items():
+    for attr, value in person_model.model_dump(exclude_unset=True).items():
         setattr(person, attr, value)
 
     await person.save()
@@ -77,7 +77,7 @@ async def update_person_by_name(
     if person is None:
         raise PersonException
 
-    for attr, value in person_model.model_dump(exclude_none=True).items():
+    for attr, value in person_model.model_dump(exclude_unset=True).items():
         setattr(person, attr, value)
 
     await person.save()
