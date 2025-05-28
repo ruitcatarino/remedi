@@ -54,6 +54,7 @@ license = { file = "LICENSE" }
 requires-python = ">=3.13"
 dependencies = [
     "aerich[toml]>=0.8.2",
+    "apscheduler[redis]>=3.11.0",
     "argon2-cffi>=23.1.0",
     "email-validator>=2.2.0",
     "fastapi>=0.115.12",

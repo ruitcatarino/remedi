@@ -6,12 +6,17 @@ from pyttings import settings
 
 from app.database import close_db, init_db
 from app.routers import ROUTERS
+from app.scheduler import MedicationScheduler
+
+medication_scheduler = MedicationScheduler()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
+    medication_scheduler.start()
     yield
+    medication_scheduler.shutdown()
     await close_db()
 
 
