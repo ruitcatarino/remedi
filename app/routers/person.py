@@ -11,9 +11,9 @@ router = APIRouter(
 )
 
 
-class PersonNotFound(HTTPException):
-    def __init__(self):
-        super().__init__(status_code=400, detail="Person not found")
+class PersonException(HTTPException):
+    def __init__(self, detail: str = "Person not found"):
+        super().__init__(status_code=400, detail=detail)
 
 
 @router.post("/register")
@@ -21,7 +21,7 @@ async def register(person_model: PersonSchema, user: User = Depends(get_user)) -
     """Register a person endpoint."""
 
     if await Person.exists(user=user, name=person_model.name):
-        raise PersonNotFound
+        raise PersonException(detail="Person registration error")
 
     await Person.create(user=user, **person_model.model_dump())
 
@@ -32,7 +32,7 @@ async def register(person_model: PersonSchema, user: User = Depends(get_user)) -
 async def get_persons(user: User = Depends(get_user)):
     persons = await Person.filter(user=user).all()
     if not persons:
-        raise PersonNotFound
+        raise PersonException
     return persons
 
 
@@ -40,7 +40,7 @@ async def get_persons(user: User = Depends(get_user)):
 async def get_person(id: int, user: User = Depends(get_user)):
     person = await Person.get_or_none(user=user, id=id)
     if person is None:
-        raise PersonNotFound
+        raise PersonException
     return person
 
 
@@ -48,7 +48,7 @@ async def get_person(id: int, user: User = Depends(get_user)):
 async def get_person_by_name(name: str, user: User = Depends(get_user)):
     person = await Person.get_or_none(user=user, name=name)
     if person is None:
-        raise PersonNotFound
+        raise PersonException
     return person
 
 
@@ -59,7 +59,7 @@ async def update_person(
     person = await Person.get_or_none(user=user, id=id)
 
     if person is None:
-        raise PersonNotFound
+        raise PersonException
 
     for attr, value in person_model.model_dump(exclude_none=True).items():
         setattr(person, attr, value)
@@ -75,7 +75,7 @@ async def update_person_by_name(
     person = await Person.get_or_none(user=user, name=name)
 
     if person is None:
-        raise PersonNotFound
+        raise PersonException
 
     for attr, value in person_model.model_dump(exclude_none=True).items():
         setattr(person, attr, value)
