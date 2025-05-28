@@ -11,12 +11,17 @@ router = APIRouter(
 )
 
 
+class PersonNotFound(HTTPException):
+    def __init__(self):
+        super().__init__(status_code=400, detail="Person not found")
+
+
 @router.post("/register")
 async def register(person_model: PersonSchema, user: User = Depends(get_user)) -> dict:
     """Register a person endpoint."""
 
     if await Person.exists(user=user, name=person_model.name):
-        raise HTTPException(status_code=400, detail="Person registration error")
+        raise PersonNotFound
 
     await Person.create(user=user, **person_model.model_dump())
 
@@ -27,7 +32,7 @@ async def register(person_model: PersonSchema, user: User = Depends(get_user)) -
 async def get_persons(user: User = Depends(get_user)):
     persons = await Person.filter(user=user).all()
     if not persons:
-        raise HTTPException(status_code=404, detail="Persons not found")
+        raise PersonNotFound
     return persons
 
 
@@ -35,7 +40,7 @@ async def get_persons(user: User = Depends(get_user)):
 async def get_person(id: int, user: User = Depends(get_user)):
     person = await Person.get_or_none(user=user, id=id)
     if person is None:
-        raise HTTPException(status_code=404, detail="Person not found")
+        raise PersonNotFound
     return person
 
 
@@ -43,7 +48,7 @@ async def get_person(id: int, user: User = Depends(get_user)):
 async def get_person_by_name(name: str, user: User = Depends(get_user)):
     person = await Person.get_or_none(user=user, name=name)
     if person is None:
-        raise HTTPException(status_code=404, detail="Person not found")
+        raise PersonNotFound
     return person
 
 
@@ -54,7 +59,7 @@ async def update_person(
     person = await Person.get_or_none(user=user, id=id)
 
     if person is None:
-        raise HTTPException(status_code=404, detail="Person not found")
+        raise PersonNotFound
 
     for attr, value in person_model.model_dump(exclude_none=True).items():
         setattr(person, attr, value)
@@ -70,7 +75,7 @@ async def update_person_by_name(
     person = await Person.get_or_none(user=user, name=name)
 
     if person is None:
-        raise HTTPException(status_code=404, detail="Person not found")
+        raise PersonNotFound
 
     for attr, value in person_model.model_dump(exclude_none=True).items():
         setattr(person, attr, value)
