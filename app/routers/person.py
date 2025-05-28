@@ -84,16 +84,25 @@ async def update_person_by_name(
     return person
 
 
-@router.delete("/", response_model=list[PersonFullSchema])
+@router.delete("/")
 async def delete_persons(user: User = Depends(get_user)):
-    return await Person.filter(user=user).delete()
+    if not await Person.exists(user=user):
+        raise PersonException
+    await Person.filter(user=user).delete()
+    return {"message": "Persons deleted successfully"}
 
 
-@router.delete("/{id}", response_model=PersonSchema)
+@router.delete("/{id}")
 async def delete_person(id: int, user: User = Depends(get_user)):
-    return await Person.filter(user=user, id=id).delete()
+    if not await Person.exists(user=user, id=id):
+        raise PersonException
+    await Person.filter(user=user, id=id).delete()
+    return {"message": "Person deleted successfully"}
 
 
-@router.delete("/name/{name}", response_model=PersonSchema)
+@router.delete("/name/{name}")
 async def delete_person_by_name(name: str, user: User = Depends(get_user)):
-    return await Person.filter(user=user, name=name).delete()
+    if not await Person.exists(user=user, name=name):
+        raise PersonException
+    await Person.filter(user=user, name=name).delete()
+    return {"message": "Person deleted successfully"}

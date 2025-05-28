@@ -223,3 +223,91 @@ async def test_update_person_by_name_invalid(async_client, token, sample_person_
     )
     assert response.status_code == 400
     assert response.json() == {"detail": "Person not found"}
+
+
+@pytest.mark.asyncio
+async def test_delete_persons(async_client, token, list_persons_data):
+    for person in list_persons_data:
+        response = await _register_person(async_client, token, person)
+        assert response.status_code == 200
+        assert response.json() == {"message": "Person registered successfully"}
+
+    response = await async_client.delete(
+        "/person/", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {"message": "Persons deleted successfully"}
+
+    response = await async_client.get(
+        "/person/", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Person not found"}
+
+
+@pytest.mark.asyncio
+async def test_delete_persons_invalid(async_client, token):
+    response = await async_client.delete(
+        "/person/", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Person not found"}
+
+
+@pytest.mark.asyncio
+async def test_delete_person(async_client, token, sample_person_data):
+    response = await _register_person(async_client, token, sample_person_data)
+    assert response.status_code == 200
+    assert response.json() == {"message": "Person registered successfully"}
+
+    response = await async_client.delete(
+        f"/person/{1}", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {"message": "Person deleted successfully"}
+
+    response = await async_client.get(
+        f"/person/{1}", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Person not found"}
+
+
+@pytest.mark.asyncio
+async def test_delete_person_invalid(async_client, token, sample_person_data):
+    response = await async_client.delete(
+        f"/person/{1}", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Person not found"}
+
+
+@pytest.mark.asyncio
+async def test_delete_person_by_name(async_client, token, sample_person_data):
+    response = await _register_person(async_client, token, sample_person_data)
+    assert response.status_code == 200
+    assert response.json() == {"message": "Person registered successfully"}
+
+    response = await async_client.delete(
+        f"/person/name/{sample_person_data['name']}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"message": "Person deleted successfully"}
+
+    response = await async_client.get(
+        f"/person/name/{sample_person_data['name']}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Person not found"}
+
+
+@pytest.mark.asyncio
+async def test_delete_person_by_name_invalid(async_client, token, sample_person_data):
+    response = await async_client.delete(
+        f"/person/name/{sample_person_data['name']}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Person not found"}
