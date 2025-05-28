@@ -10,11 +10,10 @@ async def upgrade(db: BaseDBAsyncClient) -> str:
     "name" VARCHAR(50) NOT NULL,
     "phone_number" VARCHAR(50) NOT NULL,
     "birth_date" DATE NOT NULL,
-    "is_active" BOOL NOT NULL DEFAULT True,
+    "disabled" BOOL NOT NULL DEFAULT False,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX IF NOT EXISTS "idx_user_is_acti_83722a" ON "user" ("is_active");
 CREATE TABLE IF NOT EXISTS "blacklisted_tokens" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "token_hash" VARCHAR(64) NOT NULL UNIQUE,

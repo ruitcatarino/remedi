@@ -18,7 +18,7 @@ class User(Model):
     name = fields.CharField(max_length=50)
     phone_number = fields.CharField(max_length=50)
     birth_date = fields.DateField()
-    is_active = fields.BooleanField(default=True, db_index=True)
+    disabled = fields.BooleanField(default=False)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 
@@ -33,7 +33,7 @@ class User(Model):
         payload = jwt.decode(
             token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
         )
-        return await cls.get(id=payload["id"], email=payload["email"])
+        return await cls.get(id=payload["id"], email=payload["email"], disabled=False)
 
     @property
     def access_token(self) -> str:

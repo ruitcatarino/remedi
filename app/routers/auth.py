@@ -28,10 +28,10 @@ async def register(user_model: UserSchema) -> dict:
 @router.post("/login")
 async def login(user_model: UserLoginSchema) -> dict:
     """Login endpoint."""
-    user = await User.get_or_none(email=user_model.email)
+    user = await User.get_or_none(email=user_model.email, disabled=False)
 
     if user is None or not await user.check_password(user_model.password):
-        raise HTTPException(status_code=401, detail="Login error")
+        raise HTTPException(status_code=400, detail="Login error")
 
     return {
         "message": "User logged in successfully",
