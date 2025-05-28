@@ -34,6 +34,8 @@ class MedicationSchema(BaseModel):
         None
     )
     total_doses: int | None = None
+    doses_taken: int
+    is_active: bool
     notes: str | None = None
 
 
