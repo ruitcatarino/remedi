@@ -33,7 +33,7 @@ def sample_person_data():
 
 
 @pytest.fixture
-def list_persons_data():
+def sample_person_list_data():
     """A list of persons data for testing."""
     return [
         {
@@ -82,8 +82,8 @@ async def test_register_person_invalid_token(async_client, sample_person_data):
 
 
 @pytest.mark.asyncio
-async def test_list_persons(async_client, token, list_persons_data):
-    for person in list_persons_data:
+async def test_list_persons(async_client, token, sample_person_list_data):
+    for person in sample_person_list_data:
         response = await _register_person(async_client, token, person)
         assert response.status_code == 200
         assert response.json() == {"message": "Person registered successfully"}
@@ -93,7 +93,7 @@ async def test_list_persons(async_client, token, list_persons_data):
     )
     assert response.status_code == 200
     response_data = response.json()
-    for i, person in enumerate(list_persons_data):
+    for i, person in enumerate(sample_person_list_data):
         assert response_data[i] == {
             "id": i + 1,
             "name": person["name"],
@@ -226,8 +226,8 @@ async def test_update_person_by_name_invalid(async_client, token, sample_person_
 
 
 @pytest.mark.asyncio
-async def test_delete_persons(async_client, token, list_persons_data):
-    for person in list_persons_data:
+async def test_delete_persons(async_client, token, sample_person_list_data):
+    for person in sample_person_list_data:
         response = await _register_person(async_client, token, person)
         assert response.status_code == 200
         assert response.json() == {"message": "Person registered successfully"}
