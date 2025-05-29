@@ -14,7 +14,7 @@ REDIS_DB: int = 0
 # JWT
 JWT_SECRET_KEY: str = "secret"
 JWT_ALGORITHM: str = "HS256"
-JWT_EXPIRATION: int = 3600
+JWT_EXPIRATION: int = 3600  # in seconds
 
 # Logging
 LOG_LEVEL: str = "INFO"
