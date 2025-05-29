@@ -32,7 +32,7 @@ class Medication(Model):
 
     class Meta:
         unique_together = ("person", "name", "dosage", "start_date")
-        indexes = (("start_date", "end_date", "is_active", "is_prn"))
+        indexes = ("start_date", "end_date", "is_active", "is_prn")
 
     @property
     async def next_scheduled(self) -> MedicationSchedule | None:
