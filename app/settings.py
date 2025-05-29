@@ -25,4 +25,4 @@ MAINTENANCE_MODE: bool = False
 REMINDER_GENERATION_INTERVAL: int = 12  # in hours
 REMINDER_CHECK_INTERVAL: int = 1  # in minutes
 MISSED_INTERVAL: int = 5  # in minutes
-MISSED_GRACE_PERIOD: int = 60  # in minutes
+MEDICATION_GRACE_PERIOD: int = 60  # in minutes

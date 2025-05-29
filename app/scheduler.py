@@ -87,7 +87,7 @@ class Scheduler:
     async def handles_missed_medications(self) -> None:
         """Handles missed medications, bigger than grace period."""
         now = datetime.now(ZoneInfo("UTC"))
-        grace_period = timedelta(minutes=settings.MISSED_GRACE_PERIOD)
+        grace_period = timedelta(minutes=settings.MEDICATION_GRACE_PERIOD)
 
         missed_schedules: list[MedicationSchedule] = await MedicationSchedule.filter(
             status=MedicationStatus.NOTIFIED,
