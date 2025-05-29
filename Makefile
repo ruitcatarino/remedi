@@ -59,7 +59,6 @@ test:
 	uv run ruff format --check $(CHECKFILES) || (echo "Your formatting is as wild as a 3AM coding spree. Tidy it up!" && exit 1); \
 	echo "Running mypy for type checks..."; \
 	uv run mypy $(MYPY_FILES) || (echo "Types are all over the place. Did you forget type hints existed?" && exit 1); \
-	rm -f .coverage; \
 	echo "All tests passed! You have the Gandalf approve! 🧙"
 
 
