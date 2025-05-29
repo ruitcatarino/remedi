@@ -60,8 +60,9 @@ class Medication(Model):
         now = datetime.now(ZoneInfo("UTC"))
         schedule_end = now + delta
         next_scheduled: MedicationSchedule | None = await self.next_scheduled
-        current_datetime = (
-            now if next_scheduled is None else next_scheduled.scheduled_datetime
+        current_datetime = max(
+            now if next_scheduled is None else next_scheduled.scheduled_datetime,
+            self.start_date,
         )
 
         if self.end_date is not None and schedule_end > self.end_date:
