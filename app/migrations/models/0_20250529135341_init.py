@@ -52,7 +52,8 @@ CREATE TABLE IF NOT EXISTS "medication" (
     "notes" TEXT,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "person_id" INT NOT NULL REFERENCES "person" ("id") ON DELETE CASCADE
+    "person_id" INT NOT NULL REFERENCES "person" ("id") ON DELETE CASCADE,
+    CONSTRAINT "uid_medication_person__aed88b" UNIQUE ("person_id", "name", "dosage", "start_date")
 );
 CREATE INDEX IF NOT EXISTS "idx_medication_is_prn_e12ab5" ON "medication" ("is_prn");
 CREATE INDEX IF NOT EXISTS "idx_medication_is_acti_11ec62" ON "medication" ("is_active");

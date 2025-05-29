@@ -21,10 +21,10 @@ class BlacklistedToken(Model):
 
     class Meta:
         table = "blacklisted_tokens"
-        indexes = [
+        indexes = (
             ("token_hash", "expires_at"),
             ("user", "created_at"),
-        ]
+        )
 
     @classmethod
     async def blacklist_token(

@@ -31,7 +31,8 @@ class Medication(Model):
     updated_at = fields.DatetimeField(auto_now=True)
 
     class Meta:
-        indexes = [("start_date", "end_date", "is_active", "is_prn")]
+        unique_together = ("person", "name", "dosage", "start_date")
+        indexes = (("start_date", "end_date", "is_active", "is_prn"))
 
     @property
     async def next_scheduled(self) -> MedicationSchedule | None:

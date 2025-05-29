@@ -29,10 +29,10 @@ class MedicationSchedule(Model):
     updated_at = fields.DatetimeField(auto_now=True)
 
     class Meta:
-        indexes = [
+        indexes = (
             ("medication", "status"),
             ("scheduled_datetime", "status"),
-        ]
+        )
         unique_together = ("medication", "scheduled_datetime")
 
     async def handle_take_medication(self) -> None:
@@ -73,6 +73,6 @@ class MedicationSchedule(Model):
 
     def __str__(self) -> str:
         return (
-            f"MedicationSchedule(id={self.id}, medication_id={self.medication.id}, "
-            f"status={self.status})"
+            f"MedicationSchedule(id={self.id}, "
+            f"scheduled_datetime={self.scheduled_datetime}, status={self.status})"
         )
