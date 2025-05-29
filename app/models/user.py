@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import contextlib
 import time
+from typing import TYPE_CHECKING
 
 import jwt
 from argon2 import PasswordHasher
@@ -7,6 +10,10 @@ from argon2.exceptions import VerificationError
 from pyttings import settings
 from tortoise import fields
 from tortoise.models import Model
+
+if TYPE_CHECKING:
+    from app.models.person import Person
+    from app.models.token_blacklist import BlacklistedToken
 
 ph = PasswordHasher()
 
@@ -23,14 +30,17 @@ class User(Model):
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 
+    persons: fields.ReverseRelation[Person]
+    blacklisted_tokens: fields.ReverseRelation[BlacklistedToken]
+
     @classmethod
-    async def register(cls, password: str, **kwargs) -> "User":
+    async def register(cls, password: str, **kwargs) -> User:
         return await super().create(
             password=await cls._hash_password(password), **kwargs
         )
 
     @classmethod
-    async def from_jwt(cls, token: str) -> "User":
+    async def from_jwt(cls, token: str) -> User:
         payload = jwt.decode(
             token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
         )

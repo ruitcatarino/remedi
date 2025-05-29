@@ -19,7 +19,7 @@ def convert_timedelta_to_minutes(value: timedelta | None) -> int | None:
     """Converts a timedelta object to a frequency in minutes."""
     if value is None:
         return None
-    return value.total_seconds() // 60
+    return int(value.total_seconds() // 60)
 
 
 class MedicationSchema(BaseModel):
@@ -44,7 +44,7 @@ class MedicationRegisterSchema(BaseModel):
     person_id: int
     dosage: str
     is_prn: bool = False
-    start_date: datetime | None = Field(default_factory=datetime.now)
+    start_date: datetime = Field(default_factory=datetime.now)
     end_date: datetime | None = None
     frequency: (
         Annotated[timedelta, BeforeValidator(convert_minutes_to_timedelta)] | None

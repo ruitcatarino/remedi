@@ -14,7 +14,9 @@ from app.models.user import User
 class BlacklistedToken(Model):
     id = fields.IntField(primary_key=True)
     token_hash = fields.CharField(max_length=64, unique=True, db_index=True)
-    user = fields.ForeignKeyField("models.User", related_name="blacklisted_tokens")
+    user: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
+        "models.User", related_name="blacklisted_tokens"
+    )
     expires_at = fields.DatetimeField(db_index=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     reason = fields.CharField(max_length=50, default="logout")
@@ -55,7 +57,7 @@ class BlacklistedToken(Model):
         ).exists()
 
     @classmethod
-    async def cleanup_expired_tokens(cls) -> int:
+    async def cleanup_expired_tokens(cls) -> None:
         """
         Remove expired tokens from blacklist to keep table size manageable.
         """

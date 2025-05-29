@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from datetime import datetime
 from enum import StrEnum
+from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
 from tortoise import fields
@@ -7,6 +10,9 @@ from tortoise.models import Model
 
 from app.logs import logger
 from app.models.medication_log import MedicationLog
+
+if TYPE_CHECKING:
+    from app.models.medication import Medication
 
 
 class MedicationStatus(StrEnum):
@@ -20,13 +26,15 @@ class MedicationStatus(StrEnum):
 
 class MedicationSchedule(Model):
     id = fields.IntField(primary_key=True)
-    medication = fields.ForeignKeyField(
+    medication: fields.ForeignKeyRelation[Medication] = fields.ForeignKeyField(
         "models.Medication", related_name="schedules", db_index=True
     )
     scheduled_datetime = fields.DatetimeField()
     status = fields.CharEnumField(MedicationStatus, default=MedicationStatus.SCHEDULED)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
+
+    log: fields.ReverseRelation[MedicationLog]
 
     class Meta:
         indexes = (

@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta
+from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
 from pyttings import settings
@@ -9,10 +12,13 @@ from app.logs import logger
 from app.models.medication_log import MedicationLog
 from app.models.medication_schedule import MedicationSchedule, MedicationStatus
 
+if TYPE_CHECKING:
+    from app.models.person import Person
+
 
 class Medication(Model):
     id = fields.IntField(primary_key=True)
-    person = fields.ForeignKeyField(
+    person: fields.ForeignKeyRelation[Person] = fields.ForeignKeyField(
         "models.Person", related_name="medications", db_index=True
     )
     name = fields.CharField(max_length=50)
@@ -29,6 +35,9 @@ class Medication(Model):
     notes = fields.TextField(null=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
+
+    schedules: fields.ReverseRelation[MedicationSchedule]
+    logs: fields.ReverseRelation[MedicationLog]
 
     class Meta:
         unique_together = ("person", "name", "dosage", "start_date")
@@ -63,7 +72,7 @@ class Medication(Model):
         return None
 
     async def generate_schedules(
-        self: "Medication", delta: timedelta | None = None
+        self: Medication, delta: timedelta | None = None
     ) -> None:
         """
         Create medication schedules for a medication for a defined period.
@@ -90,7 +99,7 @@ class Medication(Model):
         if self.start_date > schedule_end or current_datetime > schedule_end:
             return
 
-        schedules_to_create = []
+        schedules_to_create: list[MedicationSchedule] = []
 
         while current_datetime <= schedule_end:
             if (

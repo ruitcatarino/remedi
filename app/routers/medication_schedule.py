@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends
 
 from app.auth import get_user
@@ -22,7 +24,7 @@ async def get_medications_schedules(
     person_name: str | None = None,
     user: User = Depends(get_user),
 ):
-    filter = {}
+    filter: dict[str, Any] = {"person__user": user}
 
     if medication_id is not None:
         filter["id"] = medication_id
@@ -34,7 +36,7 @@ async def get_medications_schedules(
     elif person_name is not None:
         filter["person__name"] = person_name
 
-    medications = await Medication.filter(person__user=user, **filter).prefetch_related(
+    medications = await Medication.filter(**filter).prefetch_related(
         "schedules", "person"
     )
     if not medications:
