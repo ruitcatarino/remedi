@@ -11,7 +11,6 @@ from app.models.user import User
 from app.routers.person import PersonException
 from app.schemas.medication import (
     MedicationRegisterSchema,
-    MedicationSchedulesSchema,
     MedicationSchema,
 )
 from app.utils.date import to_utc
@@ -76,32 +75,6 @@ async def get_medication_by_name(name: str, user: User = Depends(get_user)):
     if medication is None:
         raise MedicationException
     return medication
-
-
-@router.get("/schedules", response_model=list[MedicationSchedulesSchema])
-async def get_medications_schedules(
-    medication_id: int | None = None,
-    person_id: int | None = None,
-    user: User = Depends(get_user),
-):
-    filter = {}
-
-    if medication_id is not None:
-        filter["id"] = medication_id
-
-    if person_id is not None:
-        filter["person__id"] = person_id
-
-    medications = await Medication.filter(person__user=user, **filter).prefetch_related(
-        "schedules", "person"
-    )
-    if not medications:
-        raise MedicationException
-
-    return [
-        {"medication": medication, "schedules": list(medication.schedules)}
-        for medication in medications
-    ]
 
 
 @router.delete("/")
