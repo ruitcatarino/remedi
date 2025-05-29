@@ -67,9 +67,5 @@ class Scheduler:
         """Handles missed medications, bigger than grace period."""
         ...  # TODO
 
-    async def clean_blacklist_tokens(self) -> None:
-        """Clean expired tokens from blacklist."""
-        await BlacklistedToken.cleanup_expired_tokens()
-
     def shutdown(self) -> None:
         self.scheduler.shutdown()
