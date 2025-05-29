@@ -1,6 +1,8 @@
 from tortoise import fields
 from tortoise.models import Model
 
+from app.models.medication_schedule import MedicationSchedule, MedicationStatus
+
 
 class Medication(Model):
     id = fields.IntField(primary_key=True)
@@ -24,3 +26,12 @@ class Medication(Model):
 
     class Meta:
         indexes = [("start_date", "end_date", "is_active", "is_prn")]
+
+    @property
+    async def next_scheduled(self) -> MedicationSchedule | None:
+        if self.is_prn or self.is_active is False:
+            return None
+
+        return await MedicationSchedule.filter(
+            medication=self, status=MedicationStatus.SCHEDULED
+        ).earliest("scheduled_datetime")
