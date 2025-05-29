@@ -1,7 +1,11 @@
+from datetime import datetime
 from enum import StrEnum
+from zoneinfo import ZoneInfo
 
 from tortoise import fields
 from tortoise.models import Model
+
+from app.models.medication_log import MedicationLog
 
 
 class MedicationStatus(StrEnum):
@@ -29,3 +33,21 @@ class MedicationSchedule(Model):
             ("scheduled_datetime", "status"),
         ]
         unique_together = ("medication", "scheduled_datetime")
+
+    async def handle_take_medication(self) -> None:
+        await MedicationLog.create(
+            medication=self.medication,
+            schedule=self,
+            taken_at=datetime.now(ZoneInfo("UTC")),
+        )
+        self.status = MedicationStatus.TAKEN
+        await self.save()
+
+    async def handle_medication_notification(self) -> None:
+        # TODO: send notification
+        self.status = MedicationStatus.NOTIFIED
+        await self.save()
+
+    async def handle_missed_medication(self) -> None:
+        self.status = MedicationStatus.MISSED
+        await self.save()
