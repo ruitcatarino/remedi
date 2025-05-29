@@ -1,9 +1,11 @@
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
+from pyttings import settings
 from tortoise import fields
 from tortoise.models import Model
 
+from app.models.medication_log import MedicationLog
 from app.models.medication_schedule import MedicationSchedule, MedicationStatus
 
 
@@ -88,3 +90,51 @@ class Medication(Model):
             await MedicationSchedule.bulk_create(
                 schedules_to_create, ignore_conflicts=True
             )
+
+    async def _handle_unscheduled_medication_consuption(self) -> None:
+        """Handles unscheduled medication consumption."""
+        await MedicationLog.create(
+            medication=self,
+            taken_at=datetime.now(ZoneInfo("UTC")),
+        )
+        self.doses_taken += 1
+        await self.save()
+        return
+
+    async def _handle_scheduled_medication_consuption(
+        self, next_scheduled: MedicationSchedule
+    ) -> bool:
+        """Handles scheduled medication consumption."""
+        if next_scheduled.status == MedicationStatus.MISSED:
+            await next_scheduled.handle_late_taken()
+            return True
+
+        if next_scheduled.status in [
+            MedicationStatus.SCHEDULED,
+            MedicationStatus.NOTIFIED,
+        ]:
+            await next_scheduled.handle_take_medication()
+            return True
+
+        return False
+
+    async def handle_medication_consuption(self) -> None:
+        """Handles medication consumption."""
+        if self.is_prn:
+            return await self._handle_unscheduled_medication_consuption()
+
+        grace_period = timedelta(minutes=settings.MEDICATION_GRACE_PERIOD)
+        now = datetime.now(ZoneInfo("UTC"))
+
+        next_scheduled: MedicationSchedule | None = await self.next_scheduled
+        if (
+            next_scheduled is None
+            or next_scheduled.scheduled_datetime > now + grace_period
+        ):
+            return await self._handle_unscheduled_medication_consuption()
+
+        if await self._handle_scheduled_medication_consuption(next_scheduled):
+            self.doses_taken += 1
+            await self.save()
+
+        return None

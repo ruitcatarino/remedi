@@ -43,9 +43,22 @@ class MedicationSchedule(Model):
         self.status = MedicationStatus.TAKEN
         await self.save()
 
+    async def handle_late_taken(self) -> None:
+        await MedicationLog.create(
+            medication=self.medication,
+            schedule=self,
+            taken_at=datetime.now(ZoneInfo("UTC")),
+        )
+        self.status = MedicationStatus.LATE_TAKEN
+        await self.save()
+
     async def handle_medication_notification(self) -> None:
         # TODO: send notification
         self.status = MedicationStatus.NOTIFIED
+        await self.save()
+
+    async def handle_skipped(self) -> None:
+        self.status = MedicationStatus.SKIPPED
         await self.save()
 
     async def handle_missed_medication(self) -> None:
