@@ -4,6 +4,7 @@ from zoneinfo import ZoneInfo
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.auth import get_user
+from app.logs import logger
 from app.models.medication import Medication
 from app.models.person import Person
 from app.models.user import User
@@ -38,6 +39,7 @@ async def register(
     ):
         raise HTTPException(status_code=400, detail="Start date must be in the future")
 
+    logger.info(f"Registering medication: {medication_model}")
     medication = await Medication.create(person=person, **medication_model.model_dump())
     await medication.generate_schedules()
     return {"message": "Medication registered successfully"}

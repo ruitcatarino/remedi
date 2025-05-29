@@ -7,6 +7,7 @@ from pyttings import settings
 from tortoise import fields
 from tortoise.models import Model
 
+from app.logs import logger
 from app.models.user import User
 
 
@@ -58,6 +59,7 @@ class BlacklistedToken(Model):
         """
         Remove expired tokens from blacklist to keep table size manageable.
         """
+        logger.info("Cleaning up expired tokens from blacklist")
         await cls.filter(expires_at__lt=datetime.now()).delete()
 
     def __str__(self) -> str:

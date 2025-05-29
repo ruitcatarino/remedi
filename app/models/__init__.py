@@ -6,10 +6,10 @@ from app.models.token_blacklist import BlacklistedToken
 from app.models.user import User
 
 __all__ = [
+    "BlacklistedToken",
     "Medication",
     "MedicationLog",
     "MedicationSchedule",
     "Person",
     "User",
-    "BlacklistedToken",
 ]

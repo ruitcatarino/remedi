@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.auth import get_user
+from app.logs import logger
 from app.models.person import Person
 from app.models.user import User
 from app.schemas.person import PersonRegisterSchema, PersonSchema, PersonUpdateSchema
@@ -21,8 +22,10 @@ async def register(person_model: PersonRegisterSchema, user: User = Depends(get_
     """Register a person endpoint."""
 
     if await Person.exists(user=user, name=person_model.name):
+        logger.error(f"Person registration error for person: {person_model.name}")
         raise PersonException(detail="Person registration error")
 
+    logger.info(f"Registering person: {person_model}")
     await Person.create(user=user, **person_model.model_dump())
 
     return {"message": "Person registered successfully"}
@@ -88,6 +91,7 @@ async def update_person_by_name(
 async def delete_persons(user: User = Depends(get_user)):
     if not await Person.exists(user=user):
         raise PersonException
+    logger.info(f"Deleting persons: {user}")
     await Person.filter(user=user).delete()
     return {"message": "Persons deleted successfully"}
 
@@ -96,6 +100,7 @@ async def delete_persons(user: User = Depends(get_user)):
 async def delete_person(id: int, user: User = Depends(get_user)):
     if not await Person.exists(user=user, id=id):
         raise PersonException
+    logger.info(f"Deleting person: {id}")
     await Person.filter(user=user, id=id).delete()
     return {"message": "Person deleted successfully"}
 
@@ -104,5 +109,6 @@ async def delete_person(id: int, user: User = Depends(get_user)):
 async def delete_person_by_name(name: str, user: User = Depends(get_user)):
     if not await Person.exists(user=user, name=name):
         raise PersonException
+    logger.info(f"Deleting person: {name}")
     await Person.filter(user=user, name=name).delete()
     return {"message": "Person deleted successfully"}

@@ -7,6 +7,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pyttings import settings
 from tortoise.expressions import Q
 
+from app.logs import logger
 from app.models.medication import Medication
 from app.models.medication_schedule import MedicationSchedule, MedicationStatus
 from app.models.token_blacklist import BlacklistedToken
@@ -61,6 +62,7 @@ class Scheduler:
         Create medication schedules for the defined period.
         Skip if already created.
         """
+        logger.info("Generating medication reminders")
         now = datetime.now(ZoneInfo("UTC"))
 
         future_meds: list[Medication] = await Medication.filter(
@@ -76,6 +78,7 @@ class Scheduler:
         Check for medications schedules that where missed.
         Not yet taken nor notified.
         """
+        logger.info("Checking medication schedules for missed medications")
         now = datetime.now(ZoneInfo("UTC"))
 
         schedules: list[MedicationSchedule] = await MedicationSchedule.filter(
@@ -87,6 +90,7 @@ class Scheduler:
 
     async def handles_missed_medications(self) -> None:
         """Handles missed medications, bigger than grace period."""
+        logger.info("Checking missed medications")
         now = datetime.now(ZoneInfo("UTC"))
         grace_period = timedelta(minutes=settings.MEDICATION_GRACE_PERIOD)
 

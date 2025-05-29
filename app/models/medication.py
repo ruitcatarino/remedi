@@ -5,6 +5,7 @@ from pyttings import settings
 from tortoise import fields
 from tortoise.models import Model
 
+from app.logs import logger
 from app.models.medication_log import MedicationLog
 from app.models.medication_schedule import MedicationSchedule, MedicationStatus
 
@@ -48,6 +49,7 @@ class Medication(Model):
         Create medication schedules for a medication for a defined period.
         Skip if already created.
         """
+        logger.info(f"Generating medication schedules for: {self}")
         if self.is_prn:
             return
 
@@ -93,6 +95,7 @@ class Medication(Model):
 
     async def _handle_unscheduled_medication_consuption(self) -> None:
         """Handles unscheduled medication consumption."""
+        logger.info(f"Taking unscheduled medication: {self}")
         await MedicationLog.create(
             medication=self,
             taken_at=datetime.now(ZoneInfo("UTC")),
@@ -105,6 +108,7 @@ class Medication(Model):
         self, next_scheduled: MedicationSchedule
     ) -> bool:
         """Handles scheduled medication consumption."""
+        logger.info(f"Taking scheduled medication: {self} - {next_scheduled}")
         if next_scheduled.status == MedicationStatus.MISSED:
             await next_scheduled.handle_late_taken()
             return True
@@ -120,6 +124,7 @@ class Medication(Model):
 
     async def handle_medication_consuption(self) -> None:
         """Handles medication consumption."""
+        logger.info(f"Handling medication consumption: {self}")
         if self.is_prn:
             return await self._handle_unscheduled_medication_consuption()
 
@@ -139,3 +144,10 @@ class Medication(Model):
             await self.save()
 
         return None
+
+    def __str__(self) -> str:
+        return (
+            f"Medication(start_date={self.start_date}, end_date={self.end_date}, "
+            f"frequency={self.frequency}, total_doses={self.total_doses}, "
+            f"doses_taken={self.doses_taken}, is_active={self.is_active})"
+        )

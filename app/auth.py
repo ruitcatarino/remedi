@@ -3,6 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import InvalidTokenError
 from tortoise.exceptions import DoesNotExist, MultipleObjectsReturned
 
+from app.logs import logger
 from app.models.token_blacklist import BlacklistedToken
 from app.models.user import User
 
@@ -25,9 +26,11 @@ async def get_user(
     token = credentials.credentials
 
     if await BlacklistedToken.is_token_blacklisted(token):
+        logger.warning(f"Attempted login with blacklisted token: {token}")
         raise AuthenticationError
 
     try:
         return await User.from_jwt(token)
     except (InvalidTokenError, DoesNotExist, MultipleObjectsReturned):
+        logger.exception(f"Attempted login with invalid token: {token}")
         raise AuthenticationError
