@@ -127,9 +127,10 @@ class Medication(Model):
         now = datetime.now(ZoneInfo("UTC"))
 
         next_scheduled: MedicationSchedule | None = await self.next_scheduled
-        if (
-            next_scheduled is None
-            or next_scheduled.scheduled_datetime > now + grace_period
+        if next_scheduled is None or not (
+            now - grace_period
+            <= next_scheduled.scheduled_datetime
+            <= now + grace_period
         ):
             return await self._handle_unscheduled_medication_consuption()
 
