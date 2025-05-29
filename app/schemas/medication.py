@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Annotated, Self
 
-from pydantic import BaseModel, BeforeValidator, model_validator
+from pydantic import BaseModel, BeforeValidator, Field, model_validator
 
 from app.schemas.person import PersonSchema
 
@@ -44,7 +44,7 @@ class MedicationRegisterSchema(BaseModel):
     person_id: int
     dosage: str
     is_prn: bool = False
-    start_date: datetime
+    start_date: datetime | None = Field(default_factory=datetime.now)
     end_date: datetime | None = None
     frequency: (
         Annotated[timedelta, BeforeValidator(convert_minutes_to_timedelta)] | None

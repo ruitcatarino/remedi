@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.auth import get_user
@@ -25,6 +28,12 @@ async def register(
     medication_model.start_date = to_utc(medication_model.start_date, user.timezone)
     if medication_model.end_date:
         medication_model.end_date = to_utc(medication_model.end_date, user.timezone)
+
+    if medication_model.start_date < datetime.now(ZoneInfo("UTC")) - timedelta(
+        minutes=1
+    ):
+        raise HTTPException(status_code=400, detail="Start date must be in the future")
+
     medication = await Medication.create(person=person, **medication_model.model_dump())
     await MedicationSchedule.init_medication_schedules(medication)
     return {"message": "Medication registered successfully"}

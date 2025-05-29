@@ -43,8 +43,8 @@ def sample_medication_data():
         "person_id": 1,
         "dosage": "20mg",
         "frequency": 1440,  # 1440 minutes = 1 day
-        "start_date": "2023-01-01T00:00:00Z",
-        "end_date": "2023-01-31T00:00:00Z",
+        "start_date": "2999-01-01T00:00:00Z",
+        "end_date": "2999-01-31T00:00:00Z",
     }
 
 
@@ -56,15 +56,15 @@ def sample_medication_list_data():
             "person_id": 1,
             "dosage": "20mg",
             "frequency": 1440,  # 1440 minutes = 1 day
-            "start_date": "2023-01-01T00:00:00Z",
-            "end_date": "2023-01-31T00:00:00Z",
+            "start_date": "2999-01-01T00:00:00Z",
+            "end_date": "2999-01-31T00:00:00Z",
         },
         {
             "name": "Test Medication 2",
             "person_id": 1,
             "dosage": "100µg",
             "frequency": 360,  # 360 minutes = 6 hours
-            "start_date": "2023-01-01T00:00:00Z",
+            "start_date": "2999-01-01T00:00:00Z",
             "total_doses": 3,
         },
     ]
@@ -86,6 +86,16 @@ async def test_register_medication(async_client, token, sample_medication_data):
 
 
 @pytest.mark.asyncio
+async def test_register_medication_no_start_date(
+    async_client, token, sample_medication_data
+):
+    sample_medication_data.pop("start_date")
+    response = await _register_medication(async_client, token, sample_medication_data)
+    assert response.status_code == 200
+    assert response.json() == {"message": "Medication registered successfully"}
+
+
+@pytest.mark.asyncio
 async def test_register_invalid_person(async_client, token):
     response = await _register_medication(
         async_client,
@@ -95,8 +105,8 @@ async def test_register_invalid_person(async_client, token):
             "person_id": 9999999,
             "dosage": "20mg",
             "frequency": 1440,
-            "start_date": "2023-01-01T00:00:00Z",
-            "end_date": "2023-01-31T00:00:00Z",
+            "start_date": "2999-01-01T00:00:00Z",
+            "end_date": "2999-01-31T00:00:00Z",
         },
     )
     assert response.status_code == 400
@@ -113,8 +123,8 @@ async def test_register_medication_invalid_frequency(async_client, token):
             "person_id": 1,
             "dosage": "20mg",
             "frequency": "1440",  # frequency must be a int
-            "start_date": "2023-01-01T00:00:00Z",
-            "end_date": "2023-01-31T00:00:00Z",
+            "start_date": "2999-01-01T00:00:00Z",
+            "end_date": "2999-01-31T00:00:00Z",
         },
     )
     assert response.status_code == 422
@@ -134,7 +144,7 @@ async def test_register_medication_missing_data(async_client, token):
             "person_id": 1,
             "dosage": "20mg",
             "frequency": 1440,
-            "start_date": "2023-01-01",
+            "start_date": "2999-01-01",
         },
     )
     assert response.status_code == 422
@@ -147,8 +157,8 @@ async def test_register_medication_missing_data(async_client, token):
             "person_id": 1,
             "dosage": "20mg",
             "frequency": 1440,
-            "start_date": "2023-01-01",
-            "end_date": "2023-01-31",
+            "start_date": "2999-01-01",
+            "end_date": "2999-01-31",
         },
     )
     assert response.status_code == 200
@@ -162,7 +172,7 @@ async def test_register_medication_missing_data(async_client, token):
             "person_id": 1,
             "dosage": "20mg",
             "frequency": 1440,
-            "start_date": "2023-01-01",
+            "start_date": "2999-01-01",
             "total_doses": 10,
         },
     )
