@@ -43,6 +43,25 @@ class Medication(Model):
             status__in=[MedicationStatus.SCHEDULED, MedicationStatus.NOTIFIED]
         ).earliest("scheduled_datetime")
 
+    @property
+    async def next_scheduled_in_grace_window(self) -> MedicationSchedule | None:
+        """
+        Returns the next scheduled medication that is within the grace period.
+        """
+        next_scheduled: MedicationSchedule | None = await self.next_scheduled
+
+        grace_period = timedelta(minutes=settings.MEDICATION_GRACE_PERIOD)
+        now = datetime.now(ZoneInfo("UTC"))
+
+        if next_scheduled is not None and (
+            now - grace_period
+            <= next_scheduled.scheduled_datetime
+            <= now + grace_period
+        ):
+            return next_scheduled
+
+        return None
+
     async def generate_schedules(
         self: "Medication", delta: timedelta | None = None
     ) -> None:
@@ -95,8 +114,8 @@ class Medication(Model):
                 schedules_to_create, ignore_conflicts=True
             )
 
-    async def _handle_unscheduled_medication_consuption(self) -> None:
-        """Handles unscheduled medication consumption."""
+    async def _handle_unscheduled_medication_intake(self) -> None:
+        """Handles unscheduled medication intake."""
         logger.info(f"Taking unscheduled medication: {self}")
         await MedicationLog.create(
             medication=self,
@@ -106,10 +125,10 @@ class Medication(Model):
         await self.save()
         return
 
-    async def _handle_scheduled_medication_consuption(
+    async def _handle_scheduled_medication_intake(
         self, next_scheduled: MedicationSchedule
     ) -> bool:
-        """Handles scheduled medication consumption."""
+        """Handles scheduled medication intake."""
         logger.info(f"Taking scheduled medication: {self} - {next_scheduled}")
         if next_scheduled.status == MedicationStatus.MISSED:
             await next_scheduled.handle_late_taken()
@@ -124,24 +143,20 @@ class Medication(Model):
 
         return False
 
-    async def handle_medication_consuption(self) -> None:
-        """Handles medication consumption."""
-        logger.info(f"Handling medication consumption: {self}")
-        if self.is_prn:
-            return await self._handle_unscheduled_medication_consuption()
+    async def handle_medication_intake(self) -> None:
+        """Handles medication intake."""
+        logger.info(f"Handling medication intake: {self}")
 
-        grace_period = timedelta(minutes=settings.MEDICATION_GRACE_PERIOD)
-        now = datetime.now(ZoneInfo("UTC"))
+        next_scheduled_in_grace_window: (
+            MedicationSchedule | None
+        ) = await self.next_scheduled_in_grace_window
 
-        next_scheduled: MedicationSchedule | None = await self.next_scheduled
-        if next_scheduled is None or not (
-            now - grace_period
-            <= next_scheduled.scheduled_datetime
-            <= now + grace_period
+        if next_scheduled_in_grace_window is None:
+            return await self._handle_unscheduled_medication_intake()
+
+        if await self._handle_scheduled_medication_intake(
+            next_scheduled_in_grace_window
         ):
-            return await self._handle_unscheduled_medication_consuption()
-
-        if await self._handle_scheduled_medication_consuption(next_scheduled):
             self.doses_taken += 1
             await self.save()
 
