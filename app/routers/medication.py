@@ -9,13 +9,22 @@ from app.models.medication import Medication
 from app.models.person import Person
 from app.models.user import User
 from app.routers.person import PersonException
-from app.schemas.medication import MedicationRegisterSchema, MedicationSchema
+from app.schemas.medication import (
+    MedicationRegisterSchema,
+    MedicationSchedulesSchema,
+    MedicationSchema,
+)
 from app.utils.date import to_utc
 
 router = APIRouter(
     prefix="/medication",
     tags=["Medication"],
 )
+
+
+class MedicationException(HTTPException):
+    def __init__(self, detail: str = "Medication not found"):
+        super().__init__(status_code=400, detail=detail)
 
 
 @router.post("/register")
@@ -49,5 +58,47 @@ async def register(
 async def get_medications(user: User = Depends(get_user)):
     medications = await Medication.filter(person__user=user).prefetch_related("person")
     if not medications:
-        raise HTTPException(status_code=400, detail="Medications not found")
+        raise MedicationException
     return medications
+
+
+@router.get("/schedules", response_model=list[MedicationSchedulesSchema])
+async def get_medications_schedules(
+    medication_id: int | None = None,
+    person_id: int | None = None,
+    user: User = Depends(get_user),
+):
+    filter = {}
+
+    if medication_id is not None:
+        filter["id"] = medication_id
+
+    if person_id is not None:
+        filter["person__id"] = person_id
+
+    medications = await Medication.filter(person__user=user, **filter).prefetch_related(
+        "schedules", "person"
+    )
+    if not medications:
+        raise MedicationException
+
+    return [
+        {"medication": medication, "schedules": list(medication.schedules)}
+        for medication in medications
+    ]
+
+
+@router.delete("/")
+async def delete_medications(user: User = Depends(get_user)):
+    if not await Medication.exists(person__user=user):
+        raise MedicationException
+    await Medication.filter(person__user=user).delete()
+    return {"message": "Medications deleted successfully"}
+
+
+@router.delete("/{id}")
+async def delete_medication(id: int, user: User = Depends(get_user)):
+    if not await Medication.exists(person__user=user, id=id):
+        raise MedicationException
+    await Medication.filter(person__user=user, id=id).delete()
+    return {"message": "Medication deleted successfully"}
