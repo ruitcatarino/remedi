@@ -62,6 +62,22 @@ async def get_medications(user: User = Depends(get_user)):
     return medications
 
 
+@router.get("/{id}", response_model=MedicationSchema)
+async def get_medication(id: int, user: User = Depends(get_user)):
+    medication = await Medication.get_or_none(person__user=user, id=id)
+    if medication is None:
+        raise MedicationException
+    return medication
+
+
+@router.get("/name/{name}", response_model=MedicationSchema)
+async def get_medication_by_name(name: str, user: User = Depends(get_user)):
+    medication = await Medication.get_or_none(person__user=user, name=name)
+    if medication is None:
+        raise MedicationException
+    return medication
+
+
 @router.get("/schedules", response_model=list[MedicationSchedulesSchema])
 async def get_medications_schedules(
     medication_id: int | None = None,
