@@ -54,8 +54,11 @@ class MedicationRegisterSchema(BaseModel):
 
     @model_validator(mode="after")
     def validate_end_condition(self) -> Self:
-        if self.end_date is None and self.total_doses is None:
-            raise ValueError("Either end_date or total_doses must be provided")
+        if self.end_date is None and self.total_doses is None and self.is_prn is False:
+            raise ValueError(
+                "Either end_date or total_doses must be provided for "
+                "non-PRN medications"
+            )
         if self.frequency is None and self.is_prn is False:
             raise ValueError("Frequency must be provided for non-PRN medications")
         return self

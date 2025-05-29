@@ -26,8 +26,12 @@ async def register(
     if person is None:
         raise PersonException
     medication_model.start_date = to_utc(medication_model.start_date, user.timezone)
-    if medication_model.end_date:
+    if medication_model.end_date is not None:
         medication_model.end_date = to_utc(medication_model.end_date, user.timezone)
+        if medication_model.end_date < medication_model.start_date:
+            raise HTTPException(
+                status_code=400, detail="End date must be after start date"
+            )
 
     if medication_model.start_date < datetime.now(ZoneInfo("UTC")) - timedelta(
         minutes=1

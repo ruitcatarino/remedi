@@ -1,5 +1,9 @@
+from datetime import datetime, timedelta
+
 import pytest
 import pytest_asyncio
+
+from app.models.medication import Medication
 
 
 @pytest_asyncio.fixture
@@ -43,8 +47,10 @@ def sample_medication_data():
         "person_id": 1,
         "dosage": "20mg",
         "frequency": 1440,  # 1440 minutes = 1 day
-        "start_date": "2999-01-01T00:00:00Z",
-        "end_date": "2999-01-31T00:00:00Z",
+        "start_date": (datetime.now() + timedelta(days=1)).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        ),
+        "end_date": (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
 
 
@@ -56,15 +62,21 @@ def sample_medication_list_data():
             "person_id": 1,
             "dosage": "20mg",
             "frequency": 1440,  # 1440 minutes = 1 day
-            "start_date": "2999-01-01T00:00:00Z",
-            "end_date": "2999-01-31T00:00:00Z",
+            "start_date": (datetime.now() + timedelta(days=1)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+            "end_date": (datetime.now() + timedelta(days=2)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
         },
         {
             "name": "Test Medication 2",
             "person_id": 1,
             "dosage": "100µg",
             "frequency": 360,  # 360 minutes = 6 hours
-            "start_date": "2999-01-01T00:00:00Z",
+            "start_date": (datetime.now() + timedelta(days=1)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
             "total_doses": 3,
         },
     ]
@@ -93,6 +105,8 @@ async def test_register_medication_no_start_date(
     response = await _register_medication(async_client, token, sample_medication_data)
     assert response.status_code == 200
     assert response.json() == {"message": "Medication registered successfully"}
+    medication = await Medication.get()
+    assert medication.start_date is not None
 
 
 @pytest.mark.asyncio
@@ -105,8 +119,12 @@ async def test_register_invalid_person(async_client, token):
             "person_id": 9999999,
             "dosage": "20mg",
             "frequency": 1440,
-            "start_date": "2999-01-01T00:00:00Z",
-            "end_date": "2999-01-31T00:00:00Z",
+            "start_date": (datetime.now() + timedelta(days=1)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+            "end_date": (datetime.now() + timedelta(days=2)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
         },
     )
     assert response.status_code == 400
@@ -123,8 +141,12 @@ async def test_register_medication_invalid_frequency(async_client, token):
             "person_id": 1,
             "dosage": "20mg",
             "frequency": "1440",  # frequency must be a int
-            "start_date": "2999-01-01T00:00:00Z",
-            "end_date": "2999-01-31T00:00:00Z",
+            "start_date": (datetime.now() + timedelta(days=1)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+            "end_date": (datetime.now() + timedelta(days=2)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
         },
     )
     assert response.status_code == 422
@@ -134,7 +156,7 @@ async def test_register_medication_invalid_frequency(async_client, token):
 async def test_register_medication_missing_data(async_client, token):
     """
     Test registering medication with missing data.
-    Either `end_date` or `total_doses` must be provided.
+    Either `end_date` or `total_doses` must be provided for non-PRN medications.
     """
     response = await _register_medication(
         async_client,
@@ -144,7 +166,9 @@ async def test_register_medication_missing_data(async_client, token):
             "person_id": 1,
             "dosage": "20mg",
             "frequency": 1440,
-            "start_date": "2999-01-01",
+            "start_date": (datetime.now() + timedelta(days=1)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
         },
     )
     assert response.status_code == 422
@@ -156,9 +180,10 @@ async def test_register_medication_missing_data(async_client, token):
             "name": "Test Medication",
             "person_id": 1,
             "dosage": "20mg",
-            "frequency": 1440,
-            "start_date": "2999-01-01",
-            "end_date": "2999-01-31",
+            "start_date": (datetime.now() + timedelta(days=1)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+            "is_prn": True,
         },
     )
     assert response.status_code == 200
@@ -172,7 +197,28 @@ async def test_register_medication_missing_data(async_client, token):
             "person_id": 1,
             "dosage": "20mg",
             "frequency": 1440,
-            "start_date": "2999-01-01",
+            "start_date": (datetime.now() + timedelta(days=1)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+            "end_date": (datetime.now() + timedelta(days=2)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+        },
+    )
+    assert response.status_code == 200
+    assert response.json() == {"message": "Medication registered successfully"}
+
+    response = await _register_medication(
+        async_client,
+        token,
+        {
+            "name": "Test Medication",
+            "person_id": 1,
+            "dosage": "20mg",
+            "frequency": 1440,
+            "start_date": (datetime.now() + timedelta(days=1)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
             "total_doses": 10,
         },
     )
