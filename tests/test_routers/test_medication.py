@@ -193,7 +193,7 @@ async def test_register_medication_missing_data(async_client, token):
         async_client,
         token,
         {
-            "name": "Test Medication",
+            "name": "Test Medication 2",
             "person_id": 1,
             "dosage": "20mg",
             "frequency": 1440,
@@ -212,7 +212,7 @@ async def test_register_medication_missing_data(async_client, token):
         async_client,
         token,
         {
-            "name": "Test Medication",
+            "name": "Test Medication 3",
             "person_id": 1,
             "dosage": "20mg",
             "frequency": 1440,
@@ -254,4 +254,4 @@ async def test_get_empty_medication(async_client, token):
         "/medication/", headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 400
-    assert response.json() == {"detail": "Medications not found"}
+    assert response.json() == {"detail": "Medication not found"}
