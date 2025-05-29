@@ -35,7 +35,7 @@ for router in ROUTERS:
 
 
 @app.get("/")
-async def root():
+async def welcome():
     return {"message": "Welcome to Remedi!"}
 
 
