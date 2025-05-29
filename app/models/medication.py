@@ -44,6 +44,7 @@ class Medication(Model):
     ) -> None:
         """
         Create medication schedules for a medication for a defined period.
+        Skip if already created.
         """
         if self.is_prn:
             return
@@ -84,4 +85,6 @@ class Medication(Model):
             current_datetime += self.frequency
 
         if schedules_to_create:
-            await MedicationSchedule.bulk_create(schedules_to_create)
+            await MedicationSchedule.bulk_create(
+                schedules_to_create, ignore_conflicts=True
+            )
