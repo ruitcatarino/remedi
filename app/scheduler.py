@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -82,7 +83,7 @@ class Scheduler:
         ).all()
 
         for schedule in schedules:
-            await schedule.handle_medication_notification()
+            asyncio.create_task(schedule.handle_medication_notification())
 
     async def handles_missed_medications(self) -> None:
         """Handles missed medications, bigger than grace period."""
