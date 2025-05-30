@@ -141,7 +141,7 @@ class Medication(Model):
         else:
             logger.info(f"Taking scheduled medication: {self} - {next_in_grace}")
             await next_in_grace.handle_take_medication()
-        
+
         self.doses_taken += 1
         await self.save()
         return
