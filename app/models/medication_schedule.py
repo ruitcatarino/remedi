@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import StrEnum
 from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
+from pyttings import settings
 from tortoise import fields
 from tortoise.models import Model
 
@@ -42,6 +43,13 @@ class MedicationSchedule(Model):
             ("scheduled_datetime", "status"),
         )
         unique_together = ("medication", "scheduled_datetime")
+
+    @property
+    def in_grace_period(self) -> bool:
+        """Returns True if the medication is within the grace period."""
+        grace_period = timedelta(minutes=settings.MEDICATION_GRACE_PERIOD)
+        now = datetime.now(ZoneInfo("UTC"))
+        return now - grace_period <= self.scheduled_datetime <= now + grace_period
 
     async def handle_take_medication(self) -> None:
         logger.info(f"Taking medication: {self}")
