@@ -1,6 +1,6 @@
 services:
   remedi:
-    image: remedi:latest
+    image: ruitcatarino/remedi:latest
     restart: unless-stopped
     depends_on:
       database:
