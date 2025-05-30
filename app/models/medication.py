@@ -50,7 +50,7 @@ class Medication(Model):
 
         return await self.schedules.filter(
             status__in=[MedicationStatus.SCHEDULED, MedicationStatus.NOTIFIED]
-        ).earliest("scheduled_datetime")
+        ).earliest("scheduled_datetime").prefetch_related("medication")
 
     @property
     async def next_in_grace(self) -> MedicationSchedule | None:
@@ -72,7 +72,7 @@ class Medication(Model):
 
         return await self.schedules.filter(status=MedicationStatus.MISSED).latest(
             "scheduled_datetime"
-        )
+        ).prefetch_related("medication")
 
     async def generate_schedules(
         self: Medication, delta: timedelta | None = None
