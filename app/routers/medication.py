@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException
+from tortoise.exceptions import IntegrityError
+from tortoise.transactions import in_transaction
 
 from app.auth import get_user
 from app.logs import logger
@@ -48,8 +50,17 @@ async def register(
         raise HTTPException(status_code=400, detail="Start date must be in the future")
 
     logger.info(f"Registering medication: {medication_model}")
-    medication = await Medication.create(person=person, **medication_model.model_dump())
-    await medication.generate_schedules()
+
+    try:
+        async with in_transaction():
+            medication = await Medication.create(
+                person=person, **medication_model.model_dump()
+            )
+            await medication.generate_schedules()
+    except IntegrityError as e:
+        logger.exception(f"Medication registration error: {e}")
+        raise MedicationException(detail="Medication registration error")
+
     return {"message": "Medication registered successfully"}
 
 
