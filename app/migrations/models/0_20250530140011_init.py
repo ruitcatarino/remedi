@@ -31,12 +31,14 @@ CREATE TABLE IF NOT EXISTS "person" (
     "id" SERIAL NOT NULL PRIMARY KEY,
     "name" VARCHAR(50) NOT NULL,
     "birth_date" DATE NOT NULL,
+    "is_active" BOOL NOT NULL DEFAULT True,
     "notes" TEXT,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "user_id" INT NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
     CONSTRAINT "uid_person_user_id_de8894" UNIQUE ("user_id", "name")
 );
+CREATE INDEX IF NOT EXISTS "idx_person_is_acti_248aad" ON "person" ("is_active");
 CREATE INDEX IF NOT EXISTS "idx_person_user_id_b150dd" ON "person" ("user_id");
 CREATE TABLE IF NOT EXISTS "medication" (
     "id" SERIAL NOT NULL PRIMARY KEY,
