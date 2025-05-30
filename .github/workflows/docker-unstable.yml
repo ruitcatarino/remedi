@@ -12,7 +12,7 @@ jobs:
   build_and_push_unstable:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v4
       - name: Build Docker Image
         run: |
