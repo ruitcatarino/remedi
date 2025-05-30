@@ -48,9 +48,13 @@ class Medication(Model):
         if self.is_prn or self.is_active is False:
             return None
 
-        return await self.schedules.filter(
-            status__in=[MedicationStatus.SCHEDULED, MedicationStatus.NOTIFIED]
-        ).earliest("scheduled_datetime").prefetch_related("medication")
+        return (
+            await self.schedules.filter(
+                status__in=[MedicationStatus.SCHEDULED, MedicationStatus.NOTIFIED]
+            )
+            .earliest("scheduled_datetime")
+            .prefetch_related("medication")
+        )
 
     @property
     async def next_in_grace(self) -> MedicationSchedule | None:
@@ -70,9 +74,11 @@ class Medication(Model):
         if self.is_prn or self.is_active is False:
             return None
 
-        return await self.schedules.filter(status=MedicationStatus.MISSED).latest(
-            "scheduled_datetime"
-        ).prefetch_related("medication")
+        return (
+            await self.schedules.filter(status=MedicationStatus.MISSED)
+            .latest("scheduled_datetime")
+            .prefetch_related("medication")
+        )
 
     async def generate_schedules(
         self: Medication, delta: timedelta | None = None
@@ -126,21 +132,26 @@ class Medication(Model):
                 schedules_to_create, ignore_conflicts=True
             )
 
-    async def handle_medication_intake(self) -> None:
+    async def handle_medication_intake(self, is_missed_dose: bool = False) -> None:
         """Handles medication intake."""
         logger.info(f"Handling medication intake: {self}")
 
-        next_in_grace: MedicationSchedule | None = await self.next_in_grace
+        schedule: MedicationSchedule | None = (
+            await self.next_in_grace if is_missed_dose else await self.last_missed
+        )
 
-        if next_in_grace is None:
+        if schedule is None:
             logger.info(f"Taking unscheduled medication: {self}")
             await MedicationLog.create(
                 medication=self,
                 taken_at=datetime.now(ZoneInfo("UTC")),
             )
+        elif is_missed_dose:
+            logger.info(f"Taking missed medication: {self} - {schedule}")
+            await schedule.handle_late_taken()
         else:
-            logger.info(f"Taking scheduled medication: {self} - {next_in_grace}")
-            await next_in_grace.handle_take_medication()
+            logger.info(f"Taking scheduled medication: {self} - {schedule}")
+            await schedule.handle_take_medication()
 
         self.doses_taken += 1
         await self.save()

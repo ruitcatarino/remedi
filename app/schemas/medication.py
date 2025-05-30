@@ -62,3 +62,8 @@ class MedicationRegisterSchema(BaseModel):
         if self.frequency is None and self.is_prn is False:
             raise ValueError("Frequency must be provided for non-PRN medications")
         return self
+
+
+class BulkInktakeMedicationSchema(BaseModel):
+    medication_ids: list[int]
+    missed_doses_ids: list[int] = Field(default_factory=list)

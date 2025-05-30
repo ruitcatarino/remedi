@@ -7,6 +7,7 @@ from app.schemas.medication import MedicationSchema
 
 class MedicationScheduleSchema(BaseModel):
     id: int
+    status: str
     scheduled_datetime: datetime
 
 
