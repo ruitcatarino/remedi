@@ -1,0 +1,24 @@
+name: Manual Docker Build and Push (Unstable)
+
+on:
+  workflow_dispatch:
+    inputs:
+      docker_tag:
+        description: "Docker Tag"
+        required: false
+        default: "unstable"
+
+jobs:
+  build_and_push_unstable:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: Build Docker Image
+        run: |
+          docker build . -t ruitcatarino/remedi:${{ github.event.inputs.docker_tag }}
+      - name: Push Image to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u ruitcatarino --password-stdin
+          docker push ruitcatarino/remedi:${{ github.event.inputs.docker_tag }}
+          docker push ruitcatarino/remedi:latest
