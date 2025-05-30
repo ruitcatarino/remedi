@@ -21,4 +21,3 @@ jobs:
         run: |
           echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u ruitcatarino --password-stdin
           docker push ruitcatarino/remedi:${{ github.event.inputs.docker_tag }}
-          docker push ruitcatarino/remedi:latest
