@@ -47,7 +47,7 @@ git clone <repository-url>
 cd remedi
 
 # Run with Docker Compose
-docker compose up
+docker compose up -d
 ```
 
 The application will be available at `http://localhost:8000`
@@ -61,7 +61,7 @@ cd remedi
 # Setup development environment (installs dependencies and pre-commit hooks)
 make setup
 
-docker compose up
+docker compose -f compose.dev.yml up -d
 ```
 To remove pre-commit hooks (if needed), run:
 ```bash
