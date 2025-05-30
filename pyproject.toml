@@ -51,7 +51,7 @@ src_folder = "./."
 
 [project]
 name = "remedi"
-version = "0.0.1"
+version = "0.0.1-alpha"
 description = "Add your description here"
 readme = "README.md"
 license = { file = "LICENSE" }

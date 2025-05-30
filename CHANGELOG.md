@@ -21,3 +21,14 @@ TL;DR for [Keep a changelog](https://keepachangelog.com/en/1.1.0/):
   - **Security** in case of vulnerabilities.
 
 ## [Unreleased]
+
+## [0.0.1-alpha]
+
+### Added
+- Register, Get/Filter, Update, and Delete endpoints for User/Auth and Person
+- Register and partial Get endpoints for Medication
+- Get endpoint for Medication Schedules
+- Early-stage tests
+- Background jobs to generate future schedules, notify about missed schedules, and handle missed medications
+- CI/CD pipeline to test the codebase on each push to main and publish Docker images on each tag
+- Database migration handling using [aerich](https://github.com/tortoise/aerich) and [Tortoise ORM](https://github.com/tortoise/tortoise-orm) as the ORM
