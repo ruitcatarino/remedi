@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
-from pyttings import settings
 from tortoise import fields
 from tortoise.models import Model
 
@@ -45,6 +44,7 @@ class Medication(Model):
 
     @property
     async def next_scheduled(self) -> MedicationSchedule | None:
+        """Returns the next scheduled medication."""
         if self.is_prn or self.is_active is False:
             return None
 
@@ -53,23 +53,26 @@ class Medication(Model):
         ).earliest("scheduled_datetime")
 
     @property
-    async def next_scheduled_in_grace_window(self) -> MedicationSchedule | None:
+    async def next_in_grace(self) -> MedicationSchedule | None:
         """
         Returns the next scheduled medication that is within the grace period.
         """
         next_scheduled: MedicationSchedule | None = await self.next_scheduled
 
-        grace_period = timedelta(minutes=settings.MEDICATION_GRACE_PERIOD)
-        now = datetime.now(ZoneInfo("UTC"))
-
-        if next_scheduled is not None and (
-            now - grace_period
-            <= next_scheduled.scheduled_datetime
-            <= now + grace_period
-        ):
+        if next_scheduled is not None and next_scheduled.in_grace_period:
             return next_scheduled
 
         return None
+
+    @property
+    async def last_missed(self) -> MedicationSchedule | None:
+        """Returns the last missed medication."""
+        if self.is_prn or self.is_active is False:
+            return None
+
+        return await self.schedules.filter(status=MedicationStatus.MISSED).latest(
+            "scheduled_datetime"
+        )
 
     async def generate_schedules(
         self: Medication, delta: timedelta | None = None
@@ -123,53 +126,25 @@ class Medication(Model):
                 schedules_to_create, ignore_conflicts=True
             )
 
-    async def _handle_unscheduled_medication_intake(self) -> None:
-        """Handles unscheduled medication intake."""
-        logger.info(f"Taking unscheduled medication: {self}")
-        await MedicationLog.create(
-            medication=self,
-            taken_at=datetime.now(ZoneInfo("UTC")),
-        )
-        self.doses_taken += 1
-        await self.save()
-        return
-
-    async def _handle_scheduled_medication_intake(
-        self, next_scheduled: MedicationSchedule
-    ) -> bool:
-        """Handles scheduled medication intake."""
-        logger.info(f"Taking scheduled medication: {self} - {next_scheduled}")
-        if next_scheduled.status == MedicationStatus.MISSED:
-            await next_scheduled.handle_late_taken()
-            return True
-
-        if next_scheduled.status in [
-            MedicationStatus.SCHEDULED,
-            MedicationStatus.NOTIFIED,
-        ]:
-            await next_scheduled.handle_take_medication()
-            return True
-
-        return False
-
     async def handle_medication_intake(self) -> None:
         """Handles medication intake."""
         logger.info(f"Handling medication intake: {self}")
 
-        next_scheduled_in_grace_window: (
-            MedicationSchedule | None
-        ) = await self.next_scheduled_in_grace_window
+        next_in_grace: MedicationSchedule | None = await self.next_in_grace
 
-        if next_scheduled_in_grace_window is None:
-            return await self._handle_unscheduled_medication_intake()
-
-        if await self._handle_scheduled_medication_intake(
-            next_scheduled_in_grace_window
-        ):
-            self.doses_taken += 1
-            await self.save()
-
-        return None
+        if next_in_grace is None:
+            logger.info(f"Taking unscheduled medication: {self}")
+            await MedicationLog.create(
+                medication=self,
+                taken_at=datetime.now(ZoneInfo("UTC")),
+            )
+        else:
+            logger.info(f"Taking scheduled medication: {self} - {next_in_grace}")
+            await next_in_grace.handle_take_medication()
+        
+        self.doses_taken += 1
+        await self.save()
+        return
 
     def __str__(self) -> str:
         return (
