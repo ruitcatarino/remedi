@@ -12,6 +12,6 @@ class MedicationLogSchema(BaseModel):
     taken_at: datetime
 
 
-class MedicationSchedulesSchema(BaseModel):
+class MedicationLogsSchema(BaseModel):
     medication: MedicationSchema
     logs: list[MedicationLogSchema]
