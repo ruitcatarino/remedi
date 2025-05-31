@@ -9,7 +9,6 @@ from tortoise.transactions import in_transaction
 from app.auth import get_user
 from app.logs import logger
 from app.models.medication import Medication
-from app.models.medication_schedule import MedicationStatus
 from app.models.person import Person
 from app.models.user import User
 from app.routers.person import PersonException
