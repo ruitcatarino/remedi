@@ -8,10 +8,7 @@ from app.models.token_blacklist import BlacklistedToken
 from app.models.user import User
 from app.schemas.user import UserLoginSchema, UserSchema
 
-router = APIRouter(
-    prefix="/auth",
-    tags=["Authentication"],
-)
+router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 @router.post("/register")

@@ -5,10 +5,7 @@ from app.models.medication_log import MedicationLog
 from app.models.user import User
 from app.schemas.medication_log import MedicationLogSchema
 
-router = APIRouter(
-    prefix="/log",
-    tags=["Medication Log"],
-)
+router = APIRouter(prefix="/log", tags=["Medication Log"])
 
 
 @router.get("/", response_model=list[MedicationLogSchema])

@@ -8,10 +8,7 @@ from app.models.person import Person
 from app.models.user import User
 from app.schemas.person import PersonRegisterSchema, PersonSchema, PersonUpdateSchema
 
-router = APIRouter(
-    prefix="/person",
-    tags=["Person"],
-)
+router = APIRouter(prefix="/person", tags=["Person"])
 
 
 class PersonException(HTTPException):
