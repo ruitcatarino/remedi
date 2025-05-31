@@ -62,6 +62,9 @@ cd remedi
 make setup
 
 docker compose -f compose.dev.yml up -d
+# Or
+cp compose.dev.yml compose.override.yml
+docker compose up -d
 ```
 To remove pre-commit hooks (if needed), run:
 ```bash
@@ -111,7 +114,7 @@ This project is in active development. Contributions, bug reports, and feature r
 
 ### Development Guidelines
 * Follow existing code style and patterns
-* Add tests for new functionality (minimum 80% coverage required, to be increased)
+* Add tests for new functionality
 * Update documentation for API changes
 * Use type hints throughout the codebase
 * Run `make test` before submitting changes
@@ -121,7 +124,7 @@ The project maintains high code quality standards with:
 * **Ruff**: Code formatting and linting
 * **MyPy**: Static type checking
 * **Pre-commit hooks**: Automatic code quality checks
-* **Test Coverage**: Minimum 80% coverage requirement, to be improved
+* **Test Coverage**: Minimum (uncertain, would point to more than 95%) coverage requirement
 
 ## License
 
