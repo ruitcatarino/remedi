@@ -29,7 +29,9 @@ async def get_medication_logs(user: User = Depends(get_user)):
 async def get_medication_logs_by_medication_id(
     medication_id: int, user: User = Depends(get_user)
 ):
-    medication = await Medication.get_or_none(person__user=user, id=medication_id).prefetch_related("person")
+    medication = await Medication.get_or_none(
+        person__user=user, id=medication_id
+    ).prefetch_related("person")
     if medication is None:
         raise MedicationException
     logs = await MedicationLog.filter(medication=medication).prefetch_related(
