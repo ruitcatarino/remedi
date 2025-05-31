@@ -34,7 +34,9 @@ class MedicationException(HTTPException):
 async def register(
     medication_model: MedicationRegisterSchema, user: User = Depends(get_user)
 ):
-    person = await Person.get_or_none(user=user, id=medication_model.person_id)
+    person = await Person.get_or_none(
+        user=user, id=medication_model.person_id, is_active=True
+    )
     if person is None:
         raise PersonException
 
@@ -70,7 +72,9 @@ async def register(
 async def handle_medication_intake(
     medication_id: int, is_missed_dose: bool = False, user: User = Depends(get_user)
 ):
-    medication = await Medication.get_or_none(person__user=user, id=medication_id)
+    medication = await Medication.get_or_none(
+        person__user=user, id=medication_id, is_active=True
+    )
     if medication is None:
         raise MedicationException
     await medication.handle_medication_intake(is_missed_dose)
@@ -84,10 +88,13 @@ async def handle_medication_intake_with_filters(
     is_missed_dose: bool = False,
     user: User = Depends(get_user),
 ):
-    person = await Person.get_or_none(user=user, name=person_name)
-    if person is None:
-        raise PersonException
-    medication = await Medication.get_or_none(person=person, name=medication_name)
+    medication = await Medication.get_or_none(
+        name=medication_name,
+        is_active=True,
+        person__user=user,
+        person__name=person_name,
+        person__is_active=True,
+    )
     if medication is None:
         raise MedicationException
     await medication.handle_medication_intake(is_missed_dose)
@@ -112,6 +119,7 @@ async def handle_bulk_medication_intake(
 async def get_medications(show_inactive: bool = False, user: User = Depends(get_user)):
     filters: dict[str, Any] = {"person__user": user}
     if not show_inactive:
+        filters["person__is_active"] = True
         filters["is_active"] = True
     medications = await Medication.filter(**filters).prefetch_related("person")
     if not medications:
@@ -121,14 +129,20 @@ async def get_medications(show_inactive: bool = False, user: User = Depends(get_
 
 @router.get("/filter", response_model=MedicationSchema)
 async def get_medication_with_filters(
-    medication_name: str, person_name: str, user: User = Depends(get_user)
+    medication_name: str,
+    person_name: str,
+    show_inactive: bool = False,
+    user: User = Depends(get_user),
 ):
-    person = await Person.get_or_none(user=user, name=person_name, is_active=True)
-    if person is None:
-        raise PersonException
-    medication = await Medication.get_or_none(
-        person=person, name=medication_name, is_active=True
-    ).prefetch_related("person")
+    filters: dict[str, Any] = {
+        "person__user": user,
+        "person__name": person_name,
+        "name": medication_name,
+    }
+    if not show_inactive:
+        filters["person__is_active"] = True
+        filters["is_active"] = True
+    medication = await Medication.get_or_none(**filters).prefetch_related("person")
     if medication is None:
         raise MedicationException
     return medication
@@ -144,6 +158,19 @@ async def get_medication(id: int, user: User = Depends(get_user)):
     return medication
 
 
+@router.get("/person/{person_id}", response_model=MedicationSchema)
+async def get_medication_by_person_id(
+    person_id: int, show_inactive: bool = False, user: User = Depends(get_user)
+):
+    filters: dict[str, Any] = {"person__id": person_id, "person__user": user}
+    if not show_inactive:
+        filters["is_active"] = True
+    medication = await Medication.get_or_none(**filters).prefetch_related("person")
+    if medication is None:
+        raise MedicationException
+    return medication
+
+
 @router.patch("/disable/{medication_id}")
 async def disable_medication(medication_id: int, user: User = Depends(get_user)):
     medication = await Medication.get_or_none(
@@ -151,7 +178,6 @@ async def disable_medication(medication_id: int, user: User = Depends(get_user))
     )
     if medication is None:
         raise MedicationException
-
     medication.is_active = False
     await medication.save()
     return {"message": "Medication disabled successfully"}
@@ -164,7 +190,6 @@ async def enable_medication(medication_id: int, user: User = Depends(get_user)):
     )
     if medication is None:
         raise MedicationException
-
     medication.is_active = True
     await medication.save()
     return {"message": "Medication enabled successfully"}
