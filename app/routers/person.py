@@ -32,8 +32,11 @@ async def register(person_model: PersonRegisterSchema, user: User = Depends(get_
 
 
 @router.get("/", response_model=list[PersonSchema])
-async def get_persons(user: User = Depends(get_user)):
-    persons = await Person.filter(user=user).all()
+async def get_persons(show_inactive: bool = False, user: User = Depends(get_user)):
+    filters = {"user": user}
+    if not show_inactive:
+        filters["is_active"] = True
+    persons = await Person.filter(**filters).all()
     if not persons:
         raise PersonException
     return persons
@@ -41,7 +44,7 @@ async def get_persons(user: User = Depends(get_user)):
 
 @router.get("/{id}", response_model=PersonSchema)
 async def get_person(id: int, user: User = Depends(get_user)):
-    person = await Person.get_or_none(user=user, id=id)
+    person = await Person.get_or_none(user=user, id=id, is_active=True)
     if person is None:
         raise PersonException
     return person
@@ -49,7 +52,7 @@ async def get_person(id: int, user: User = Depends(get_user)):
 
 @router.get("/name/{name}", response_model=PersonSchema)
 async def get_person_by_name(name: str, user: User = Depends(get_user)):
-    person = await Person.get_or_none(user=user, name=name)
+    person = await Person.get_or_none(user=user, name=name, is_active=True)
     if person is None:
         raise PersonException
     return person
@@ -59,7 +62,7 @@ async def get_person_by_name(name: str, user: User = Depends(get_user)):
 async def update_person(
     id: int, person_model: PersonUpdateSchema, user: User = Depends(get_user)
 ):
-    person = await Person.get_or_none(user=user, id=id)
+    person = await Person.get_or_none(user=user, id=id, is_active=True)
 
     if person is None:
         raise PersonException
@@ -75,7 +78,7 @@ async def update_person(
 async def update_person_by_name(
     name: str, person_model: PersonUpdateSchema, user: User = Depends(get_user)
 ):
-    person = await Person.get_or_none(user=user, name=name)
+    person = await Person.get_or_none(user=user, name=name, is_active=True)
 
     if person is None:
         raise PersonException
@@ -85,6 +88,28 @@ async def update_person_by_name(
 
     await person.save()
     return person
+
+
+@router.patch("/disable/{person_id}")
+async def disable_person(person_id: int, user: User = Depends(get_user)):
+    person = await Person.get_or_none(user=user, id=person_id, is_active=True)
+    if person is None:
+        raise PersonException
+
+    person.is_active = False
+    await person.save()
+    return {"message": "Person disabled successfully"}
+
+
+@router.patch("/enable/{person_id}")
+async def enable_person(person_id: int, user: User = Depends(get_user)):
+    person = await Person.get_or_none(user=user, id=person_id, is_active=False)
+    if person is None:
+        raise PersonException
+
+    person.is_active = True
+    await person.save()
+    return {"message": "Person enabled successfully"}
 
 
 @router.delete("/")
