@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.auth import get_user
@@ -33,7 +35,7 @@ async def register(person_model: PersonRegisterSchema, user: User = Depends(get_
 
 @router.get("/", response_model=list[PersonSchema])
 async def get_persons(show_inactive: bool = False, user: User = Depends(get_user)):
-    filters = {"user": user}
+    filters: dict[str, Any] = {"user": user}
     if not show_inactive:
         filters["is_active"] = True
     persons = await Person.filter(**filters).all()

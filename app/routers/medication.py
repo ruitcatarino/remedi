@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Any
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -109,7 +110,7 @@ async def handle_bulk_medication_intake(
 
 @router.get("/", response_model=list[MedicationSchema])
 async def get_medications(show_inactive: bool = False, user: User = Depends(get_user)):
-    filters = {"person__user": user}
+    filters: dict[str, Any] = {"person__user": user}
     if not show_inactive:
         filters["is_active"] = True
     medications = await Medication.filter(**filters).prefetch_related("person")
