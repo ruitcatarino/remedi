@@ -143,7 +143,7 @@ async def get_medication(id: int, user: User = Depends(get_user)):
     return medication
 
 
-@router.put("/disable/{medication_id}")
+@router.patch("/disable/{medication_id}")
 async def disable_medication(medication_id: int, user: User = Depends(get_user)):
     medication = await Medication.get_or_none(
         person__user=user, id=medication_id, is_active=True
@@ -156,7 +156,7 @@ async def disable_medication(medication_id: int, user: User = Depends(get_user))
     return {"message": "Medication disabled successfully"}
 
 
-@router.put("/enable/{medication_id}")
+@router.patch("/enable/{medication_id}")
 async def enable_medication(medication_id: int, user: User = Depends(get_user)):
     medication = await Medication.get_or_none(
         person__user=user, id=medication_id, is_active=False
