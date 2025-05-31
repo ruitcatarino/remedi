@@ -132,6 +132,13 @@ class Medication(Model):
                 schedules_to_create, ignore_conflicts=True
             )
 
+    async def delete_future_schedules(self) -> None:
+        """Delete all future medication schedules."""
+        await self.schedules.filter(
+            scheduled_datetime__gt=datetime.now(ZoneInfo("UTC")),
+            status__in=[MedicationStatus.SCHEDULED, MedicationStatus.NOTIFIED],
+        ).delete()
+
     async def handle_medication_intake(self, is_missed_dose: bool = False) -> None:
         """Handles medication intake."""
         logger.info(f"Handling medication intake: {self}")

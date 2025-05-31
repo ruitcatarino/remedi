@@ -9,6 +9,7 @@ from tortoise.transactions import in_transaction
 from app.auth import get_user
 from app.logs import logger
 from app.models.medication import Medication
+from app.models.medication_schedule import MedicationStatus
 from app.models.person import Person
 from app.models.user import User
 from app.routers.person import PersonException
@@ -19,10 +20,7 @@ from app.schemas.medication import (
 )
 from app.utils.date import to_utc
 
-router = APIRouter(
-    prefix="/medication",
-    tags=["Medication"],
-)
+router = APIRouter(prefix="/medication", tags=["Medication"])
 
 
 class MedicationException(HTTPException):
@@ -180,6 +178,7 @@ async def disable_medication(medication_id: int, user: User = Depends(get_user))
         raise MedicationException
     medication.is_active = False
     await medication.save()
+    await medication.delete_future_schedules()
     return {"message": "Medication disabled successfully"}
 
 
@@ -192,4 +191,5 @@ async def enable_medication(medication_id: int, user: User = Depends(get_user)):
         raise MedicationException
     medication.is_active = True
     await medication.save()
+    await medication.generate_schedules()
     return {"message": "Medication enabled successfully"}
