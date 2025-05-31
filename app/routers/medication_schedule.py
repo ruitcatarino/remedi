@@ -10,13 +10,10 @@ from app.schemas.medication_schedule import (
     MedicationSchedulesSchema,
 )
 
-router = APIRouter(
-    prefix="/schedule",
-    tags=["Medication Schedule"],
-)
+router = APIRouter(prefix="/schedule", tags=["Medication Schedule"])
 
 
-@router.get("/", response_model=list[MedicationSchedulesSchema])
+@router.get("/filters", response_model=list[MedicationSchedulesSchema])
 async def get_medications_schedules(
     medication_id: int | None = None,
     medication_name: str | None = None,
@@ -36,7 +33,7 @@ async def get_medications_schedules(
     elif person_name is not None:
         filter["person__name"] = person_name
 
-    medications = await Medication.filter(**filter).prefetch_related(
+    medications = await Medication.filter(**filter, is_active=True).prefetch_related(
         "schedules", "person"
     )
     if not medications:
