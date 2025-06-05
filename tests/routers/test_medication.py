@@ -84,17 +84,25 @@ def sample_medication_list_data():
 
 async def _register_medication(async_client, token, medication_data):
     return await async_client.post(
-        "/medications/register",
+        "/medications/",
         json=medication_data,
         headers={"Authorization": f"Bearer {token}"},
     )
 
 
+async def _register_medication_and_validate(async_client, token, medication_data):
+    response = await _register_medication(async_client, token, medication_data)
+    assert response.status_code == 201
+    for key, value in medication_data.items():
+        if key == "person_id":
+            continue
+        assert response.json()[key] == value
+    return response
+
+
 @pytest.mark.asyncio
 async def test_register_medication(async_client, token, sample_medication_data):
-    response = await _register_medication(async_client, token, sample_medication_data)
-    assert response.status_code == 200
-    assert response.json() == {"message": "Medication registered successfully"}
+    await _register_medication_and_validate(async_client, token, sample_medication_data)
 
 
 @pytest.mark.asyncio
@@ -102,9 +110,7 @@ async def test_register_medication_no_start_date(
     async_client, token, sample_medication_data
 ):
     sample_medication_data.pop("start_date")
-    response = await _register_medication(async_client, token, sample_medication_data)
-    assert response.status_code == 200
-    assert response.json() == {"message": "Medication registered successfully"}
+    await _register_medication_and_validate(async_client, token, sample_medication_data)
     medication = await Medication.get()
     assert medication.start_date is not None
 
@@ -186,8 +192,7 @@ async def test_register_medication_missing_data(async_client, token):
             "is_prn": True,
         },
     )
-    assert response.status_code == 200
-    assert response.json() == {"message": "Medication registered successfully"}
+    assert response.status_code == 201
 
     response = await _register_medication(
         async_client,
@@ -205,8 +210,7 @@ async def test_register_medication_missing_data(async_client, token):
             ),
         },
     )
-    assert response.status_code == 200
-    assert response.json() == {"message": "Medication registered successfully"}
+    assert response.status_code == 201
 
     response = await _register_medication(
         async_client,
@@ -222,16 +226,15 @@ async def test_register_medication_missing_data(async_client, token):
             "total_doses": 10,
         },
     )
-    assert response.status_code == 200
-    assert response.json() == {"message": "Medication registered successfully"}
+    assert response.status_code == 201
 
 
 @pytest.mark.asyncio
 async def test_get_medication(async_client, token, sample_medication_list_data):
     for medication in sample_medication_list_data:
-        response = await _register_medication(async_client, token, medication)
-        assert response.status_code == 200
-        assert response.json() == {"message": "Medication registered successfully"}
+        response = await _register_medication_and_validate(
+            async_client, token, medication
+        )
 
     response = await async_client.get(
         "/medications/", headers={"Authorization": f"Bearer {token}"}
@@ -253,5 +256,5 @@ async def test_get_empty_medication(async_client, token):
     response = await async_client.get(
         "/medications/", headers={"Authorization": f"Bearer {token}"}
     )
-    assert response.status_code == 400
-    assert response.json() == {"detail": "Medication not found"}
+    assert response.status_code == 200
+    assert response.json() == []

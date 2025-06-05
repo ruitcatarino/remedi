@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from tortoise.exceptions import DoesNotExist, IntegrityError
 
@@ -40,7 +42,7 @@ async def create_person(
 
 @router.get("/", response_model=list[PersonSchema])
 async def get_user_persons(
-    show_inactive: bool = Query(default=False, description="Show inactive Persons"),
+    show_inactive: Annotated[bool, Query(description="Show inactive Persons")] = False,
     user: User = Depends(get_user),
 ):
     """Get all persons for the current user"""
