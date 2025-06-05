@@ -104,6 +104,7 @@ async def get_medications_schedules_now(
         for medication, schedules in result.items()
     ]
 
+
 @router.get("/{medication_id}", response_model=list[MedicationScheduleSchema])
 async def get_medication_schedule_by_id(
     medication_id: int,
