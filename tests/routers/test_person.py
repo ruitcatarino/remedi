@@ -10,7 +10,7 @@ async def token(async_client):
             "email": "test@example.com",
             "password": "testpassword123",
             "name": "Test User",
-            "phone_number": "+1234567890",
+            "phone_number": "+351919999999",
             "birth_date": "1990-01-01",
         },
     )
