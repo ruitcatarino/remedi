@@ -33,6 +33,7 @@ erDiagram
         int user_id FK
         string name
         date birth_date
+        boolean is_active
         text notes
         timestamp created_at
         timestamp updated_at
