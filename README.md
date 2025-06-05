@@ -71,7 +71,7 @@ To remove pre-commit hooks (if needed), run:
 rm .git/hooks/pre-commit
 ```
 
-The development setup (`compose.override.yml`) includes:
+The development setup (`compose.dev.yml`) includes:
 * **Hot Reload**: Automatic code reloading with uvicorn
 * **Debugger**: DebugPy integration for debugging
 * **Volume Mounts**: Live code changes without rebuilding
