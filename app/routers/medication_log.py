@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from tortoise.exceptions import DoesNotExist
 
 from app.auth import get_user
 from app.models.medication import Medication
@@ -33,12 +34,13 @@ async def get_medication_logs_by_medication_id(
     medication_id: int, user: User = Depends(get_user)
 ):
     """Get all medication logs for a specific medication for the current user"""
-    medication = await Medication.get_or_none(
-        person__user=user, id=medication_id
-    ).prefetch_related("person")
-    if medication is None:
+    try:
+        medication = await Medication.get(
+            person__user=user, id=medication_id
+        ).prefetch_related("person")
+    except DoesNotExist:
         raise MedicationException
-    logs = await MedicationLog.filter(medication__id=medication).prefetch_related(
+    logs = await MedicationLog.filter(medication=medication).prefetch_related(
         "schedule", "medication__person"
     )
     if not logs:
