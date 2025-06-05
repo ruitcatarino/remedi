@@ -419,6 +419,15 @@ wheels = [
 ]
 
 [[package]]
+name = "phonenumbers"
+version = "9.0.6"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/40/57/2923088eb7fe397a544dcf31f31705ddd3d2d6f965d68c8d7ce2afe70856/phonenumbers-9.0.6.tar.gz", hash = "sha256:bfb228cfc4a5644f7c1a32ded1bd2ee6f8e3749e422fbdabd57661e86ad8872d", size = 2297098, upload-time = "2025-05-28T05:45:48.251Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1a/65/b760522ce1b080e1d8af50d63e537beb5642ff043d789e4d7f5e3b4c3b30/phonenumbers-9.0.6-py2.py3-none-any.whl", hash = "sha256:b4a0f5a0dc30235b273d06acfe9afc2160cce4f1c8220067985ed81d72bb29a9", size = 2582823, upload-time = "2025-05-28T05:45:44.078Z" },
+]
+
+[[package]]
 name = "pluggy"
 version = "1.5.0"
 source = { registry = "https://pypi.org/simple" }
@@ -473,6 +482,19 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/a4/99/bddde3ddde76c03b65dfd5a66ab436c4e58ffc42927d4ff1198ffbf96f5f/pydantic_core-2.27.2-cp313-cp313-win32.whl", hash = "sha256:1ebaf1d0481914d004a573394f4be3a7616334be70261007e47c2a6fe7e50130", size = 1834387, upload-time = "2024-12-18T11:29:33.481Z" },
     { url = "https://files.pythonhosted.org/packages/71/47/82b5e846e01b26ac6f1893d3c5f9f3a2eb6ba79be26eef0b759b4fe72946/pydantic_core-2.27.2-cp313-cp313-win_amd64.whl", hash = "sha256:953101387ecf2f5652883208769a79e48db18c6df442568a0b5ccd8c2723abee", size = 1990453, upload-time = "2024-12-18T11:29:35.533Z" },
     { url = "https://files.pythonhosted.org/packages/51/b2/b2b50d5ecf21acf870190ae5d093602d95f66c9c31f9d5de6062eb329ad1/pydantic_core-2.27.2-cp313-cp313-win_arm64.whl", hash = "sha256:ac4dbfd1691affb8f48c2c13241a2e3b60ff23247cbcf981759c768b6633cf8b", size = 1885186, upload-time = "2024-12-18T11:29:37.649Z" },
+]
+
+[[package]]
+name = "pydantic-extra-types"
+version = "2.10.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7e/ba/4178111ec4116c54e1dc7ecd2a1ff8f54256cdbd250e576882911e8f710a/pydantic_extra_types-2.10.5.tar.gz", hash = "sha256:1dcfa2c0cf741a422f088e0dbb4690e7bfadaaf050da3d6f80d6c3cf58a2bad8", size = 138429, upload-time = "2025-06-02T09:31:52.713Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/70/1a/5f4fd9e7285f10c44095a4f9fe17d0f358d1702a7c74a9278c794e8a7537/pydantic_extra_types-2.10.5-py3-none-any.whl", hash = "sha256:b60c4e23d573a69a4f1a16dd92888ecc0ef34fb0e655b4f305530377fa70e7a8", size = 38315, upload-time = "2025-06-02T09:31:51.229Z" },
 ]
 
 [[package]]
@@ -557,7 +579,9 @@ dependencies = [
     { name = "argon2-cffi" },
     { name = "email-validator" },
     { name = "fastapi" },
+    { name = "phonenumbers" },
     { name = "pydantic" },
+    { name = "pydantic-extra-types" },
     { name = "pyjwt" },
     { name = "pyttings" },
     { name = "tortoise-orm", extra = ["asyncpg"] },
@@ -583,7 +607,9 @@ requires-dist = [
     { name = "argon2-cffi", specifier = ">=23.1.0" },
     { name = "email-validator", specifier = ">=2.2.0" },
     { name = "fastapi", specifier = ">=0.115.12" },
+    { name = "phonenumbers", specifier = ">=9.0.6" },
     { name = "pydantic", specifier = ">=2.10.6" },
+    { name = "pydantic-extra-types", specifier = ">=2.10.5" },
     { name = "pyjwt", specifier = ">=2.10.1" },
     { name = "pyttings", specifier = ">=2.1.0" },
     { name = "tortoise-orm", extras = ["asyncpg"], specifier = ">=0.24.2" },

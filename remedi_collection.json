@@ -22,7 +22,7 @@
           },
           "body": {
             "contentType": "application/json",
-            "body": "{\n  \"email\": \"test@mail.com\",\n  \"password\": \"test\",\n  \"name\": \"test\",\n  \"phone_number\": \"91239139193\",\n  \"birth_date\": \"1999-04-23\"\n}"
+            "body": "{\n  \"email\": \"testing@mail.com\",\n  \"password\": \"testing\",\n  \"name\": \"testing\",\n  \"phone_number\": \"+351929999999\",\n  \"birth_date\": \"1999-04-23\"\n}"
           },
           "requestVariables": [],
           "responses": {}
@@ -69,8 +69,8 @@
         }
       ],
       "auth": {
-        "authActive": true,
-        "authType": "inherit"
+        "authType": "inherit",
+        "authActive": true
       },
       "headers": [],
       "_ref_id": "coll_mazddsyq_efdd7890-d892-40c0-bc5f-ecc070b4627c"
@@ -593,8 +593,8 @@
         }
       ],
       "auth": {
-        "authType": "inherit",
-        "authActive": true
+        "authActive": true,
+        "authType": "inherit"
       },
       "headers": [],
       "_ref_id": "coll_mb9ndeub_c25ae4ab-bc2d-4e6c-877c-6d559c52e714"
@@ -655,9 +655,9 @@
   ],
   "requests": [],
   "auth": {
-    "token": "<<token>>",
+    "authActive": true,
     "authType": "bearer",
-    "authActive": true
+    "token": "<<token>>"
   },
   "headers": [],
   "_ref_id": "coll_mazddlw6_ee752672-de4a-4e94-a4a7-46a09106d004"
