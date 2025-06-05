@@ -22,7 +22,10 @@ TL;DR for [Keep a changelog](https://keepachangelog.com/en/1.1.0/):
 
 ## [Unreleased]
 
-## [0.0.1-alpha]
+### Changed
+- Cleaned and improved endpoints in general
+
+## [0.0.1-alpha] - 2025-05-30
 
 ### Added
 - Register, Get/Filter, Update, and Delete endpoints for User/Auth and Person
