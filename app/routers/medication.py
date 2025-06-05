@@ -19,7 +19,7 @@ from app.schemas.medication import (
 )
 from app.utils.date import to_utc
 
-router = APIRouter(prefix="/medication", tags=["Medication"])
+router = APIRouter(prefix="/medications", tags=["medications"])
 
 
 class MedicationException(HTTPException):

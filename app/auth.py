@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import InvalidTokenError
 from tortoise.exceptions import DoesNotExist, MultipleObjectsReturned
@@ -14,7 +14,7 @@ class AuthenticationError(HTTPException):
     """Generic exception for authentication errors."""
 
     def __init__(self, detail: str = "Authentication failed"):
-        super().__init__(status_code=401, detail=detail)
+        super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail)
 
 
 async def get_user(

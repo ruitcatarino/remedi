@@ -29,7 +29,7 @@ async def token(async_client):
     ).json()["token"]
     # Register a test person
     await async_client.post(
-        "/person/register",
+        "/persons/",
         json={
             "name": "Test Person",
             "birth_date": "1990-01-01",
@@ -84,7 +84,7 @@ def sample_medication_list_data():
 
 async def _register_medication(async_client, token, medication_data):
     return await async_client.post(
-        "/medication/register",
+        "/medications/register",
         json=medication_data,
         headers={"Authorization": f"Bearer {token}"},
     )
@@ -234,7 +234,7 @@ async def test_get_medication(async_client, token, sample_medication_list_data):
         assert response.json() == {"message": "Medication registered successfully"}
 
     response = await async_client.get(
-        "/medication/", headers={"Authorization": f"Bearer {token}"}
+        "/medications/", headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 200
     response_data = response.json()
@@ -251,7 +251,7 @@ async def test_get_medication(async_client, token, sample_medication_list_data):
 @pytest.mark.asyncio
 async def test_get_empty_medication(async_client, token):
     response = await async_client.get(
-        "/medication/", headers={"Authorization": f"Bearer {token}"}
+        "/medications/", headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 400
     assert response.json() == {"detail": "Medication not found"}
