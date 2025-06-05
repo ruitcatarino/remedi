@@ -69,8 +69,8 @@
         }
       ],
       "auth": {
-        "authType": "inherit",
-        "authActive": true
+        "authActive": true,
+        "authType": "inherit"
       },
       "headers": [],
       "_ref_id": "coll_mazddsyq_efdd7890-d892-40c0-bc5f-ecc070b4627c"
@@ -82,9 +82,9 @@
       "requests": [
         {
           "v": "13",
-          "name": "Register Person",
+          "name": "Create Person",
           "method": "POST",
-          "endpoint": "<<host>>/person/register",
+          "endpoint": "<<host>>/persons/",
           "params": [],
           "headers": [],
           "preRequestScript": "",
@@ -104,7 +104,7 @@
           "v": "13",
           "name": "Get (All) Persons",
           "method": "GET",
-          "endpoint": "<<host>>/person/",
+          "endpoint": "<<host>>/persons/",
           "params": [],
           "headers": [],
           "preRequestScript": "",
@@ -124,27 +124,7 @@
           "v": "13",
           "name": "Get Person (id)",
           "method": "GET",
-          "endpoint": "<<host>>/person/1",
-          "params": [],
-          "headers": [],
-          "preRequestScript": "",
-          "testScript": "",
-          "auth": {
-            "authType": "inherit",
-            "authActive": true
-          },
-          "body": {
-            "contentType": null,
-            "body": null
-          },
-          "requestVariables": [],
-          "responses": {}
-        },
-        {
-          "v": "13",
-          "name": "Get Person (name)",
-          "method": "GET",
-          "endpoint": "<<host>>/person/name/test",
+          "endpoint": "<<host>>/persons/1",
           "params": [],
           "headers": [],
           "preRequestScript": "",
@@ -164,7 +144,7 @@
           "v": "13",
           "name": "Update Person (id)",
           "method": "PUT",
-          "endpoint": "<<host>>/person/1",
+          "endpoint": "<<host>>/persons/1",
           "params": [],
           "headers": [],
           "preRequestScript": "",
@@ -182,11 +162,18 @@
         },
         {
           "v": "13",
-          "name": "Update Person (name)",
-          "method": "PUT",
-          "endpoint": "<<host>>/person/name/test",
+          "name": "Disable Person (id)",
+          "method": "PATCH",
+          "endpoint": "<<host>>/persons/disable/1",
           "params": [],
-          "headers": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "",
+              "active": true,
+              "description": ""
+            }
+          ],
           "preRequestScript": "",
           "testScript": "",
           "auth": {
@@ -195,18 +182,25 @@
           },
           "body": {
             "contentType": "application/json",
-            "body": "{\n  \"name\": \"test\",\n  \"birth_date\": \"1997-04-23\"\n}"
+            "body": ""
           },
           "requestVariables": [],
           "responses": {}
         },
         {
           "v": "13",
-          "name": "Delete (All) Persons",
-          "method": "DELETE",
-          "endpoint": "<<host>>/person/",
+          "name": "Enable Person (id)",
+          "method": "PATCH",
+          "endpoint": "<<host>>/persons/enable/1",
           "params": [],
-          "headers": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "",
+              "active": true,
+              "description": ""
+            }
+          ],
           "preRequestScript": "",
           "testScript": "",
           "auth": {
@@ -215,7 +209,7 @@
           },
           "body": {
             "contentType": "application/json",
-            "body": "{\n  \"name\": \"test\",\n  \"birth_date\": \"1997-04-23\"\n}"
+            "body": ""
           },
           "requestVariables": [],
           "responses": {}
@@ -224,27 +218,7 @@
           "v": "13",
           "name": "Delete Persons (id)",
           "method": "DELETE",
-          "endpoint": "<<host>>/person/1",
-          "params": [],
-          "headers": [],
-          "preRequestScript": "",
-          "testScript": "",
-          "auth": {
-            "authType": "inherit",
-            "authActive": true
-          },
-          "body": {
-            "contentType": "application/json",
-            "body": "{\n  \"name\": \"test\",\n  \"birth_date\": \"1997-04-23\"\n}"
-          },
-          "requestVariables": [],
-          "responses": {}
-        },
-        {
-          "v": "13",
-          "name": "Delete Persons (name)",
-          "method": "DELETE",
-          "endpoint": "<<host>>/person/name/test",
+          "endpoint": "<<host>>/persons/1",
           "params": [],
           "headers": [],
           "preRequestScript": "",
@@ -262,8 +236,8 @@
         }
       ],
       "auth": {
-        "authType": "inherit",
-        "authActive": true
+        "authActive": true,
+        "authType": "inherit"
       },
       "headers": [],
       "_ref_id": "coll_mb3mddtg_f814956c-5779-4034-8f5b-81c7411d3705"
@@ -275,9 +249,9 @@
       "requests": [
         {
           "v": "13",
-          "name": "Register Medication",
+          "name": "Create Medication",
           "method": "POST",
-          "endpoint": "<<host>>/medication/register",
+          "endpoint": "<<host>>/medications/",
           "params": [],
           "headers": [],
           "preRequestScript": "",
@@ -288,7 +262,61 @@
           },
           "body": {
             "contentType": "application/json",
-            "body": "{\n        \"name\": \"test_medication_5\",\n        \"person_id\": 1,\n        \"dosage\": \"20mg\",\n        \"frequency\": 60, //in minutes\n        \"start_date\": \"2025-05-30T00:00:00\",\n        \"end_date\": \"2027-01-01T00:00:00\"\n    }"
+            "body": "{\n        \"name\": \"test_medication_2\",\n        \"person_id\": 1,\n        \"dosage\": \"20mg\",\n        \"frequency\": 60, //in minutes\n  \t\t\"is_prn\": false,\n        \"start_date\": \"2025-06-05T14:15:00\",\n        \"end_date\": \"2027-01-01T00:00:00\"\n    }"
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "13",
+          "name": "Intake Medication (id)",
+          "method": "POST",
+          "endpoint": "<<host>>/medications/intake/2",
+          "params": [
+            {
+              "key": "is_missed_dose",
+              "value": "False",
+              "active": false,
+              "description": "Default: False"
+            }
+          ],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": ""
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "13",
+          "name": "Intake Medication Bulk (ids)",
+          "method": "POST",
+          "endpoint": "<<host>>/medications/bulk-intake",
+          "params": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"medication_ids\": [1,2],\n  \"missed_doses_ids\": [] //ids of medications that were forgoten/missed and where scheduled\n}\n"
           },
           "requestVariables": [],
           "responses": {}
@@ -297,7 +325,73 @@
           "v": "13",
           "name": "Get (All) Medications",
           "method": "GET",
-          "endpoint": "<<host>>/medication/",
+          "endpoint": "<<host>>/medications/",
+          "params": [
+            {
+              "key": "show_inactive",
+              "value": "False",
+              "active": true,
+              "description": "Default: False"
+            }
+          ],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "13",
+          "name": "Get  Medications (filters)",
+          "method": "GET",
+          "endpoint": "<<host>>/medications/filter",
+          "params": [
+            {
+              "key": "medication_name",
+              "value": "medication_test",
+              "active": true,
+              "description": "Medication Name (Mandatory)"
+            },
+            {
+              "key": "person_name",
+              "value": "test",
+              "active": true,
+              "description": "Person Name (Mandatory)"
+            },
+            {
+              "key": "show_inactive",
+              "value": "False",
+              "active": true,
+              "description": "Default: False (Oprional)"
+            }
+          ],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "13",
+          "name": "Get  Medications (id)",
+          "method": "GET",
+          "endpoint": "<<host>>/medications/1",
           "params": [],
           "headers": [],
           "preRequestScript": "",
@@ -309,6 +403,87 @@
           "body": {
             "contentType": null,
             "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "13",
+          "name": "Get  Medications (Person id)",
+          "method": "GET",
+          "endpoint": "<<host>>/medications/person/1",
+          "params": [
+            {
+              "key": "show_inactive",
+              "value": "False",
+              "active": true,
+              "description": "Default: False"
+            }
+          ],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "13",
+          "name": "Disable Medication (id)",
+          "method": "PATCH",
+          "endpoint": "<<host>>/medications/disable/1",
+          "params": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": ""
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "13",
+          "name": "Enable Medication (id)",
+          "method": "PATCH",
+          "endpoint": "<<host>>/medications/enable/1",
+          "params": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"medication_ids\": [1,2]\n}\n"
           },
           "requestVariables": [],
           "responses": {}
@@ -330,11 +505,11 @@
           "v": "13",
           "name": "Get Medications Schedules",
           "method": "GET",
-          "endpoint": "<<host>>/schedule",
+          "endpoint": "<<host>>/medication-schedules/",
           "params": [
             {
               "key": "medication_id",
-              "value": "8",
+              "value": "1",
               "active": false,
               "description": "Medication ID (Optional)"
             },
@@ -347,13 +522,58 @@
             {
               "key": "medication_name",
               "value": "test_medication",
-              "active": true,
+              "active": false,
               "description": "Medication Name (Optional)"
             },
             {
               "key": "person_name",
               "value": "test",
-              "active": true,
+              "active": false,
+              "description": "Person Name (Optional)"
+            }
+          ],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "13",
+          "name": "Get Medications Schedules to intake Now",
+          "method": "GET",
+          "endpoint": "<<host>>/medication-schedules/now",
+          "params": [
+            {
+              "key": "medication_id",
+              "value": "1",
+              "active": false,
+              "description": "Medication ID (Optional)"
+            },
+            {
+              "key": "person_id",
+              "value": "1",
+              "active": false,
+              "description": "Person ID (Optional)"
+            },
+            {
+              "key": "medication_name",
+              "value": "test_medication",
+              "active": false,
+              "description": "Medication Name (Optional)"
+            },
+            {
+              "key": "person_name",
+              "value": "test",
+              "active": false,
               "description": "Person Name (Optional)"
             }
           ],
@@ -373,18 +593,71 @@
         }
       ],
       "auth": {
-        "authActive": true,
-        "authType": "inherit"
+        "authType": "inherit",
+        "authActive": true
       },
       "headers": [],
       "_ref_id": "coll_mb9ndeub_c25ae4ab-bc2d-4e6c-877c-6d559c52e714"
+    },
+    {
+      "v": 8,
+      "name": "Medication Log",
+      "folders": [],
+      "requests": [
+        {
+          "v": "13",
+          "name": "Get Medications Logs",
+          "method": "GET",
+          "endpoint": "<<host>>/medication-logs/",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "13",
+          "name": "Get Medications Logs (Medication id)",
+          "method": "GET",
+          "endpoint": "<<host>>/medication-logs/medication/1",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "_ref_id": "coll_mbavv7r6_3231963d-1a27-48a3-9e6d-7c6b9fec3481"
     }
   ],
   "requests": [],
   "auth": {
-    "authActive": true,
+    "token": "<<token>>",
     "authType": "bearer",
-    "token": "<<token>>"
+    "authActive": true
   },
   "headers": [],
   "_ref_id": "coll_mazddlw6_ee752672-de4a-4e94-a4a7-46a09106d004"
