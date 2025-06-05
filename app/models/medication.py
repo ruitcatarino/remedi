@@ -144,7 +144,7 @@ class Medication(Model):
         logger.info(f"Handling medication intake: {self}")
 
         schedule: MedicationSchedule | None = (
-            await self.next_in_grace if is_missed_dose else await self.last_missed
+            await self.last_missed if is_missed_dose else await self.next_in_grace
         )
 
         if schedule is None:
