@@ -24,6 +24,7 @@ TL;DR for [Keep a changelog](https://keepachangelog.com/en/1.1.0/):
 
 ### Changed
 - Cleaned and improved endpoints in general
+- Increase test coverage
 
 ## [0.0.1-alpha] - 2025-05-30
 

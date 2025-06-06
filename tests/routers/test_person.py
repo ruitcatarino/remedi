@@ -140,10 +140,101 @@ async def test_update_person(async_client, token, sample_person_data):
 
 
 @pytest.mark.asyncio
-async def test_update_person_invalid(async_client, token, sample_person_data):
+async def test_update_person_not_found(async_client, token, sample_person_data):
     response = await async_client.put(
         f"/persons/{1}",
         json=sample_person_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Person not found"}
+
+
+@pytest.mark.asyncio
+async def test_invalid_update_person(async_client, token, sample_person_list_data):
+    for id, person in enumerate(sample_person_list_data, start=1):
+        response = await _register_person(async_client, token, person)
+        assert response.status_code == 201
+        assert response.json() == person | {"id": id}
+
+    response = await async_client.put(
+        f"/persons/{1}",
+        json={"name": sample_person_list_data[1]["name"]},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 409
+    assert response.json() == {"detail": "Update failed due to constraint violation"}
+
+
+@pytest.mark.asyncio
+async def test_disable_person(async_client, token, sample_person_data):
+    response = await _register_person(async_client, token, sample_person_data)
+    assert response.status_code == 201
+    assert response.json() == sample_person_data | {"id": 1}
+
+    response = await async_client.patch(
+        "/persons/disable/1",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+
+    response = await async_client.get(
+        "/persons/", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+@pytest.mark.asyncio
+async def test_disable_person_not_found(async_client, token):
+    response = await async_client.patch(
+        "/persons/disable/999",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Person not found"}
+
+
+@pytest.mark.asyncio
+async def test_enable_person(async_client, token, sample_person_data):
+    response = await _register_person(async_client, token, sample_person_data)
+    assert response.status_code == 201
+    assert response.json() == sample_person_data | {"id": 1}
+
+    response = await async_client.patch(
+        "/persons/disable/1",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+
+    response = await async_client.get(
+        "/persons/", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+    assert response.json() == []
+
+    response = await async_client.patch(
+        "/persons/enable/1",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+
+    response = await async_client.get(
+        "/persons/", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+    assert response.json()[0] == {
+        "id": 1,
+        "name": sample_person_data["name"],
+        "birth_date": sample_person_data["birth_date"],
+        "notes": sample_person_data["notes"],
+    }
+
+
+@pytest.mark.asyncio
+async def test_enable_person_not_found(async_client, token):
+    response = await async_client.patch(
+        "/persons/enable/999",
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 400

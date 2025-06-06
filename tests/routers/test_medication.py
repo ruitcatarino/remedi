@@ -97,6 +97,20 @@ async def test_register_medication(
 
 
 @pytest.mark.asyncio
+async def test_register_medication_duplicated(
+    async_client, token_with_person, sample_medication_data
+):
+    await _register_medication_and_validate(
+        async_client, token_with_person, sample_medication_data
+    )
+    response = await _register_medication(
+        async_client, token_with_person, sample_medication_data
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Medication registration error"}
+
+
+@pytest.mark.asyncio
 async def test_register_medication_no_start_date(
     async_client, token_with_person, sample_medication_data
 ):
@@ -149,6 +163,48 @@ async def test_register_medication_invalid_frequency(async_client, token_with_pe
         },
     )
     assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_register_medication_invalid_end_date(async_client, token_with_person):
+    response = await _register_medication(
+        async_client,
+        token_with_person,
+        {
+            "name": "Test Medication",
+            "person_id": 1,
+            "dosage": "20mg",
+            "frequency": 1440,
+            "start_date": (datetime.now() + timedelta(days=1)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+            "end_date": (datetime.now()).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),  # end_date must be greater than start_date
+        },
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "End date must be after start date"}
+
+
+@pytest.mark.asyncio
+async def test_register_medication_invalid_start_date(async_client, token_with_person):
+    response = await _register_medication(
+        async_client,
+        token_with_person,
+        {
+            "name": "Test Medication",
+            "person_id": 1,
+            "dosage": "20mg",
+            "frequency": 1440,
+            "start_date": (datetime.now() - timedelta(days=1)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),  # start_date must be in the future
+            "end_date": (datetime.now()).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        },
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Start date must be in the future"}
 
 
 @pytest.mark.asyncio
