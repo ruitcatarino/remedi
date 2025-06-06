@@ -11,13 +11,11 @@ help:
 	@echo "Targets:"
 	@echo "    setup               Install dependencies and pre-commit hooks"
 	@echo "    style               Run ruff format and check"
-	@echo "    test [path=dir]     Run tests with coverage"
+	@echo "    test                Run tests with coverage"
 	@echo
 	@echo "Examples:"
 	@echo "    make setup"
 	@echo "    make style"
-	@echo "    make test"
-	@echo "    make test path=tests/test_settings.py"
 
 
 # Environment Setup with Hooks
@@ -48,7 +46,7 @@ test:
 	@set -e; \
 	echo "Starting tests... Buckle up!"; \
 	echo "Running tests with coverage..."; \
-	$(PY_WARN) uv run coverage run -m pytest $(path) || (echo "Tests failed like a bad soufflé. Check your errors and try again." && exit 1); \
+	$(PY_WARN) uv run coverage run -m pytest . || (echo "Tests failed like a bad soufflé. Check your errors and try again." && exit 1); \
 	echo "Generating coverage report..."; \
 	uv run coverage report --omit="tests/**/*.py,app/database.py,app/settings.py" --show-missing --skip-covered --fail-under=40 || (echo "Uh oh! Coverage is below ??%. Write more tests or hire an intern." && exit 1); \
 	echo "Validating the tests coverage..."; \
