@@ -7,27 +7,10 @@ from app.models.medication import Medication
 
 
 @pytest_asyncio.fixture
-async def token(async_client):
+async def token_with_person(async_client, token):
     """
     Register a test user, a test person and get a token for authentication.
     """
-    await async_client.post(
-        "/auth/register",
-        json={
-            "email": "test@example.com",
-            "password": "testpassword123",
-            "name": "Test User",
-            "phone_number": "+351919999999",
-            "birth_date": "1990-01-01",
-        },
-    )
-    token = (
-        await async_client.post(
-            "/auth/login",
-            json={"email": "test@example.com", "password": "testpassword123"},
-        )
-    ).json()["token"]
-    # Register a test person
     await async_client.post(
         "/persons/",
         json={
@@ -82,16 +65,20 @@ def sample_medication_list_data():
     ]
 
 
-async def _register_medication(async_client, token, medication_data):
+async def _register_medication(async_client, token_with_person, medication_data):
     return await async_client.post(
         "/medications/",
         json=medication_data,
-        headers={"Authorization": f"Bearer {token}"},
+        headers={"Authorization": f"Bearer {token_with_person}"},
     )
 
 
-async def _register_medication_and_validate(async_client, token, medication_data):
-    response = await _register_medication(async_client, token, medication_data)
+async def _register_medication_and_validate(
+    async_client, token_with_person, medication_data
+):
+    response = await _register_medication(
+        async_client, token_with_person, medication_data
+    )
     assert response.status_code == 201
     for key, value in medication_data.items():
         if key == "person_id":
@@ -101,25 +88,31 @@ async def _register_medication_and_validate(async_client, token, medication_data
 
 
 @pytest.mark.asyncio
-async def test_register_medication(async_client, token, sample_medication_data):
-    await _register_medication_and_validate(async_client, token, sample_medication_data)
+async def test_register_medication(
+    async_client, token_with_person, sample_medication_data
+):
+    await _register_medication_and_validate(
+        async_client, token_with_person, sample_medication_data
+    )
 
 
 @pytest.mark.asyncio
 async def test_register_medication_no_start_date(
-    async_client, token, sample_medication_data
+    async_client, token_with_person, sample_medication_data
 ):
     sample_medication_data.pop("start_date")
-    await _register_medication_and_validate(async_client, token, sample_medication_data)
+    await _register_medication_and_validate(
+        async_client, token_with_person, sample_medication_data
+    )
     medication = await Medication.get()
     assert medication.start_date is not None
 
 
 @pytest.mark.asyncio
-async def test_register_invalid_person(async_client, token):
+async def test_register_invalid_person(async_client, token_with_person):
     response = await _register_medication(
         async_client,
-        token,
+        token_with_person,
         {
             "name": "Test Medication",
             "person_id": 9999999,
@@ -138,10 +131,10 @@ async def test_register_invalid_person(async_client, token):
 
 
 @pytest.mark.asyncio
-async def test_register_medication_invalid_frequency(async_client, token):
+async def test_register_medication_invalid_frequency(async_client, token_with_person):
     response = await _register_medication(
         async_client,
-        token,
+        token_with_person,
         {
             "name": "Test Medication",
             "person_id": 1,
@@ -159,14 +152,14 @@ async def test_register_medication_invalid_frequency(async_client, token):
 
 
 @pytest.mark.asyncio
-async def test_register_medication_missing_data(async_client, token):
+async def test_register_medication_missing_data(async_client, token_with_person):
     """
     Test registering medication with missing data.
     Either `end_date` or `total_doses` must be provided for non-PRN medications.
     """
     response = await _register_medication(
         async_client,
-        token,
+        token_with_person,
         {
             "name": "Test Medication",
             "person_id": 1,
@@ -181,7 +174,7 @@ async def test_register_medication_missing_data(async_client, token):
 
     response = await _register_medication(
         async_client,
-        token,
+        token_with_person,
         {
             "name": "Test Medication",
             "person_id": 1,
@@ -196,7 +189,7 @@ async def test_register_medication_missing_data(async_client, token):
 
     response = await _register_medication(
         async_client,
-        token,
+        token_with_person,
         {
             "name": "Test Medication 2",
             "person_id": 1,
@@ -214,7 +207,7 @@ async def test_register_medication_missing_data(async_client, token):
 
     response = await _register_medication(
         async_client,
-        token,
+        token_with_person,
         {
             "name": "Test Medication 3",
             "person_id": 1,
@@ -230,14 +223,16 @@ async def test_register_medication_missing_data(async_client, token):
 
 
 @pytest.mark.asyncio
-async def test_get_medication(async_client, token, sample_medication_list_data):
+async def test_get_medication(
+    async_client, token_with_person, sample_medication_list_data
+):
     for medication in sample_medication_list_data:
         response = await _register_medication_and_validate(
-            async_client, token, medication
+            async_client, token_with_person, medication
         )
 
     response = await async_client.get(
-        "/medications/", headers={"Authorization": f"Bearer {token}"}
+        "/medications/", headers={"Authorization": f"Bearer {token_with_person}"}
     )
     assert response.status_code == 200
     response_data = response.json()
@@ -252,9 +247,9 @@ async def test_get_medication(async_client, token, sample_medication_list_data):
 
 
 @pytest.mark.asyncio
-async def test_get_empty_medication(async_client, token):
+async def test_get_empty_medication(async_client, token_with_person):
     response = await async_client.get(
-        "/medications/", headers={"Authorization": f"Bearer {token}"}
+        "/medications/", headers={"Authorization": f"Bearer {token_with_person}"}
     )
     assert response.status_code == 200
     assert response.json() == []

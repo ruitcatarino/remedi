@@ -163,3 +163,17 @@ async def test_logout_invalid_token(async_client):
     )
     assert response.status_code == 401
     assert response.json() == {"detail": "Authentication failed"}
+
+
+@pytest.mark.asyncio
+async def test_using_blacklisted_token(async_client, token):
+    response = await async_client.post(
+        "/auth/logout", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+
+    response = await async_client.get(
+        "/persons/", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Authentication failed"}
