@@ -34,11 +34,6 @@ for router in ROUTERS:
     app.include_router(router)
 
 
-@app.get("/")
-async def welcome():
-    return {"message": "Welcome to Remedi!"}
-
-
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
